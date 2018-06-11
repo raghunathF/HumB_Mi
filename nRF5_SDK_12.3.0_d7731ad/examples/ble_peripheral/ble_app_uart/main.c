@@ -81,8 +81,9 @@
 #include "buzzer.h"
 #include "sound_buzzer.h"
 #include "ledarray_map.h"
+#include "fstorage.h"
 
-
+#include  "f_save.h"
 
 uint8_t INITIAL_NAME[2] = {'M','B'};
 
@@ -239,24 +240,26 @@ void set_devicename_array()
  */
 static void gap_params_init(void)
 {
-    uint32_t                err_code;
-    ble_gap_conn_params_t   gap_conn_params;
-    ble_gap_conn_sec_mode_t sec_mode;
-	
+    uint32_t                	err_code;
+    ble_gap_conn_params_t   	gap_conn_params;
+    ble_gap_conn_sec_mode_t 	sec_mode;	
 		
-		uint8_t 								addr_byte	 = 0;
+		uint8_t 									addr_byte	 = 0;
 	
 		set_devicename_array();
 	  
 	  BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
-    err_code = sd_ble_gap_device_name_set(&sec_mode,
+    
+	  err_code = sd_ble_gap_device_name_set(&sec_mode,
                                           (const uint8_t *) DEVICE_NAME,
-                                          strlen(DEVICE_NAME));
-		
-    APP_ERROR_CHECK(err_code);
+                                          strlen(DEVICE_NAME));	
+    
+	  APP_ERROR_CHECK(err_code);
 
+																					
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
 
+																					
     gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
     gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
     gap_conn_params.slave_latency     = SLAVE_LATENCY;
@@ -264,6 +267,7 @@ static void gap_params_init(void)
 
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
     APP_ERROR_CHECK(err_code);
+
 }
 
 
@@ -573,10 +577,25 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     ble_nus_on_ble_evt(&m_nus, p_ble_evt);
     on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
-    bsp_btn_ble_on_ble_evt(p_ble_evt);
-
+    //bsp_btn_ble_on_ble_evt(p_ble_evt);
 }
 
+
+
+/**@brief Function for dispatching a system event to interested modules.
+ *
+ * @details This function is called from the System event interrupt handler after a system
+ *          event has been received.
+ *
+ * @param[in] sys_evt  System stack event.
+ */
+static void sys_evt_dispatch(uint32_t sys_evt)
+{
+		fs_sys_event_handler(sys_evt);
+}
+
+
+		
 
 /**@brief Function for the SoftDevice initialization.
  *
@@ -609,6 +628,10 @@ static void ble_stack_init(void)
 
     // Subscribe for BLE events.
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
+    APP_ERROR_CHECK(err_code);
+		
+		// Register with the SoftDevice handler module for BLE events.
+    err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -1011,8 +1034,9 @@ int main(void)
 	
 	  init_temp_p_data();
 	  init_micro_LEDs();
-		
+			
 	  init_microbit_sensors();
+		
 	  //init_finch_LED();
 		//init_HM_LEDS();
 	  
@@ -1029,14 +1053,19 @@ int main(void)
     advertising_init();
     conn_params_init();
 
-
 		getInitials_fancyName();
+		
+		
+		start_check_update_calibrate();
+		//calibrate_compass();
+		//calibrate_compass();
+		//calibrate_compass();
+		
 		start_LEDarray_advertising();
-
 
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
-
+		
     // Enter main loop.    
 		for (;;)
     {
