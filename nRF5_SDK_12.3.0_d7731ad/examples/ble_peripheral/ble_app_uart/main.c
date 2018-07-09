@@ -82,6 +82,7 @@
 #include "sound_buzzer.h"
 #include "ledarray_map.h"
 #include "fstorage.h"
+#include "rude_words.h"
 
 #include  "f_save.h"
 
@@ -103,10 +104,10 @@ uint8_t INITIAL_NAME[2] = {'M','B'};
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
 
 #define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
-#define APP_ADV_TIMEOUT_IN_SECONDS      180                                         /**< The advertising timeout (in units of seconds). */
+#define APP_ADV_TIMEOUT_IN_SECONDS      0                                         /**< The advertising timeout (in units of seconds). */
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_OP_QUEUE_SIZE         5                                           /**< Size of timer operation queues. */
+#define APP_TIMER_OP_QUEUE_SIZE         10                                           /**< Size of timer operation queues. */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(20, UNIT_1_25_MS)             /**< Minimum acceptable connection interval (20 ms), Connection interval uses 1.25 ms units. */
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(75, UNIT_1_25_MS)             /**< Maximum acceptable connection interval (75 ms), Connection interval uses 1.25 ms units. */
@@ -153,10 +154,15 @@ const char possible_names[] = {'F','N','H','M','F','L','H','B','B','2','C','3'};
 char 	DEVICE_NAME [20];
 
 
-
 int mood_bit = 0;
 uint8_t temp_p_data[20];
 uint8_t temp_p_sensor_data[20];
+
+
+uint8_t buffer_data[255];
+volatile uint8_t tail_pointer = 0;
+volatile uint8_t head_pointer = 0; 
+
 volatile uint8_t rgb_value[3];
 uint8_t input_micro_packet[20];
 
@@ -169,6 +175,23 @@ bool start_advertising_flashing  = false;
 bool stop_advertising_flashing   = false;
 
 bool LED_array_enable = true;
+
+
+
+uint8_t sound_effect =  0;
+
+
+#define SOUND_STARTUP         1 
+#define SOUND_CONNECTION      2
+#define SOUND_DISCONNECTION   3
+
+
+#define SENSORS_LENGTH  5
+
+
+uint8_t initials_name[3];
+
+
 
 /**@brief Function for assert macro callback.
  *
@@ -185,6 +208,8 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 {
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
+
+
 
 
 /**@brief 		Function for converting Hex values to ASCII values
@@ -206,6 +231,10 @@ char convert_ascii(char input)
 }
 
 
+/**@brief 		Function for setting the device name  it either starts with HB or MB 
+ *            the next five characters are taken from the last five hex values of MAC address
+ *						followed by Null.
+ */
 
 void set_devicename_array()
 {
@@ -260,7 +289,7 @@ static void gap_params_init(void)
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
 
 																					
-    gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
+    gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;                    
     gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
     gap_conn_params.slave_latency     = SLAVE_LATENCY;
     gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
@@ -282,59 +311,35 @@ static void gap_params_init(void)
  */
 /**@snippet [Handling the data received over BLE] */
 
-void change_led()
-{
-	
-	 uint32_t temp1 = 0;
-	 uint32_t temp2 = 0;
-	 uint32_t temp3 = 0;
-	 
-
-	 /*
-	 if(temp_p_data[0] == 'A')
-		{
-			
-				 temp1 = temp_p_data[7] ;
-				 temp2 = temp_p_data[8] ; 
-				 temp2 = temp2 << 8; 
-				 temp3 = temp_p_data[9] ; 
-				 temp3 = temp3 << 16;
-				 temp1 = temp1 + temp2 + temp3;
-				 LED_value = temp1;
-				 led_change = true;
-				 rgb_value[0]= temp_p_data[1];
-				 rgb_value[1]= temp_p_data[2];
-				 rgb_value[2]= temp_p_data[3];
-				 
-		}
-		*/
-		
-}
-
+//Ring Buffer implemented
 static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
 {	 	
 			uint32_t i =0;
-			/*
-			for ( i = 0; i < length; i++)
+	    uint8_t start_add = 0;
+	    uint8_t temp_data[20];
+	  	transmit_length = length; 
+	    //nrf_gpio_pin_set(TEST_PIN_2);
+	    start_add  = tail_pointer;
+	    buffer_data[start_add] = length;
+	    uint8_t k=0;
+	    if(start_add < 240)
 			{
-					
-					while (app_uart_put(p_data[i]) != NRF_SUCCESS);
+				for ( i = start_add+1 ; i <= start_add + length ; i++)
+				{		
+						buffer_data[i] = p_data[k];              //store in ring buffer
+					  k++;
+				}
+				tail_pointer = tail_pointer + length + 1; //incremnet the tail ,1 to include the length 
 			}
-			*/
-	   // nrf_gpio_pin_set(TEST_PIN_2);
-			UART_interrupt_flag = true;
-	    transmit_length = length; 
-			for ( i = 0; i < length; i++)
+			else
 			{
-					
-					temp_p_data[i] = p_data[i];
+				tail_pointer = 0;
+				head_pointer = 0;
 			}
 			//nrf_gpio_pin_clear(TEST_PIN_2);
-			//change_led();
-			//while (app_uart_put('\r') != NRF_SUCCESS);
-			//while (app_uart_put('\n') != NRF_SUCCESS);
-	  //}
 }
+
+
 
 /**@snippet [Handling the data received over BLE] */
 /**@brief Function for initializing services that will be used by the application.
@@ -409,24 +414,6 @@ static void conn_params_init(void)
 }
 
 
-/**@brief Function for putting the chip into sleep mode.
- *
- * @note This function will not return.
- */
-static void sleep_mode_enter(void)
-{
-    uint32_t err_code = bsp_indication_set(BSP_INDICATE_IDLE);
-    APP_ERROR_CHECK(err_code);
-
-    // Prepare wakeup buttons.
-    err_code = bsp_btn_ble_sleep_mode_prepare();
-    APP_ERROR_CHECK(err_code);
-
-    // Go to system-off mode (this function will not return; wakeup will cause a reset).
-    err_code = sd_power_system_off();
-    APP_ERROR_CHECK(err_code);
-}
-
 
 /**@brief Function for handling advertising events.
  *
@@ -441,27 +428,20 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
     switch (ble_adv_evt)
     {
         case BLE_ADV_EVT_FAST:
-            err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
-            APP_ERROR_CHECK(err_code);
             break;
         case BLE_ADV_EVT_IDLE:
-            sleep_mode_enter();
             break;
         default:
             break;
     }
 }
 
-uint8_t sound_effect =  0;
 
-#define SOUND_STARTUP         1 
-#define SOUND_CONNECTION      2
-#define SOUND_DISCONNECTION   3
 
 
 /**@brief Function for the application's SoftDevice event handler.
  *
- * @param[in] p_ble_evt SoftDevice event.
+ * @param[in] p_ble_evt SoftDevice event. Sound of connetcion and disconnetion and starting of LED advertiding flashing .
  */
 static void on_ble_evt(ble_evt_t * p_ble_evt)
 {
@@ -470,22 +450,16 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
-					
-            //err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
-            //APP_ERROR_CHECK(err_code);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 				    sound_effect  = SOUND_CONNECTION;
 				    stop_advertising_flashing = true;
-				    //stop_flashing_timer();
             break; // BLE_GAP_EVT_CONNECTED
 
         case BLE_GAP_EVT_DISCONNECTED:
-            //err_code = bsp_indication_set(BSP_INDICATE_IDLE);
-            //APP_ERROR_CHECK(err_code);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
+				    broadcast_stop();
 				    sound_effect  = SOUND_DISCONNECTION;
 				    start_advertising_flashing = true;
-				    //start_LEDarray_advertising();
             break; // BLE_GAP_EVT_DISCONNECTED
 
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
@@ -577,7 +551,6 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     ble_nus_on_ble_evt(&m_nus, p_ble_evt);
     on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
-    //bsp_btn_ble_on_ble_evt(p_ble_evt);
 }
 
 
@@ -636,160 +609,7 @@ static void ble_stack_init(void)
 }
 
 
-/**@brief Function for handling events from the BSP module.
- *
- * @param[in]   event   Event generated by button press.
- */
-void bsp_event_handler(bsp_event_t event)
-{
-    uint32_t err_code;
-    switch (event)
-    {
-        case BSP_EVENT_SLEEP:
-            sleep_mode_enter();
-            break;
 
-        case BSP_EVENT_DISCONNECT:
-            err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-            if (err_code != NRF_ERROR_INVALID_STATE)
-            {
-                APP_ERROR_CHECK(err_code);
-            }
-            break;
-
-        case BSP_EVENT_WHITELIST_OFF:
-            if (m_conn_handle == BLE_CONN_HANDLE_INVALID)
-            {
-                err_code = ble_advertising_restart_without_whitelist();
-                if (err_code != NRF_ERROR_INVALID_STATE)
-                {
-                    APP_ERROR_CHECK(err_code);
-                }
-            }
-            break;
-
-        default:
-            break;
-    }
-}
-#define SENSORS_LENGTH  5
-
-
-// Timeout handler for the single shot timer
-static void transmit_handler(void * p_context)
-{
-	uint32_t err_code;
-	err_code = ble_nus_string_send(&m_nus, data_array, index+1);
-	
-	first_byte = true;
-	index = 0;
-	if (err_code != NRF_ERROR_INVALID_STATE)
-	{
-			APP_ERROR_CHECK(err_code);
-	}
-}
-
-static void create_timers()
-{   
-    uint32_t err_code;
-
-    // Create timers
-    err_code = app_timer_create(&transmit_timer_id,
-                                APP_TIMER_MODE_SINGLE_SHOT,
-                                transmit_handler);
-    APP_ERROR_CHECK(err_code);
-}
-
-
-//
-void start_timer()
-{
-	uint32_t error_code_1=0;
-	error_code_1 = app_timer_start(transmit_timer_id, APP_TIMER_TICKS(4, APP_TIMER_PRESCALER), NULL);
-  APP_ERROR_CHECK(error_code_1);
-}
-
-
-
-/**@brief   Function for handling app_uart events.
- *
- * @details This function will receive a single character from the app_uart module and append it to 
- *          a string. The string will be be sent over BLE when the last character received was a 
- *          'new line' i.e '\n' (hex 0x0D) or if the string has reached a length of 
- *          @ref NUS_MAX_DATA_LENGTH.
- */
-/**@snippet [Handling the data received over UART] */
-void uart_event_handle(app_uart_evt_t * p_event)
-{
-    
-    volatile uint32_t       err_code;
-		static uint8_t tmpByte = 0;
-
-    switch (p_event->evt_type)
-    {
-        case APP_UART_DATA_READY:
-        		app_uart_get(&tmpByte);
-						if(first_byte == true)
-						{
-							start_timer();
-							first_byte = false;
-							index = 0;
-							data_array[index] = tmpByte;
-							
-						}
-						else
-						{
-							index++;
-							data_array[index] = tmpByte;							
-						}
-	
-            break;
-
-        case APP_UART_COMMUNICATION_ERROR:
-					  err_code = p_event->data.error_code;
-						app_uart_flush();
-            break;
-
-        case APP_UART_FIFO_ERROR:
-					  err_code = p_event->data.error_code;
-						app_uart_flush();
-            break;
-
-        default:
-            break;
-    }
-}
-
-
-/**@snippet [Handling the data received over UART] */
-
-
-/**@brief  Function for initializing the UART module.
- */
-/**@snippet [UART Initialization] */
-static void uart_init(void)
-{
-    uint32_t                     err_code;
-    const app_uart_comm_params_t comm_params =
-    {
-        RX_MICRO,
-        TX_MICRO,
-        RTS_PIN_NUMBER,
-        CTS_PIN_NUMBER,
-        APP_UART_FLOW_CONTROL_DISABLED,
-        false,
-        UART_BAUDRATE_BAUDRATE_Baud115200
-    };
-
-    APP_UART_FIFO_INIT( &comm_params,
-                       UART_RX_BUF_SIZE,
-                       UART_TX_BUF_SIZE,
-                       uart_event_handle,
-                       APP_IRQ_PRIORITY_LOWEST,
-                       err_code);
-    APP_ERROR_CHECK(err_code);
-}
-/**@snippet [UART Initialization] */
 
 
 /**@brief Function for initializing the Advertising functionality.
@@ -805,12 +625,14 @@ static void advertising_init(void)
     memset(&advdata, 0, sizeof(advdata));
     advdata.name_type          = BLE_ADVDATA_FULL_NAME;
     advdata.include_appearance = false;
-    advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+    advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
 
+	
     memset(&scanrsp, 0, sizeof(scanrsp));
     scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
     scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
 
+	
     memset(&options, 0, sizeof(options));
     options.ble_adv_fast_enabled  = true;
     options.ble_adv_fast_interval = APP_ADV_INTERVAL;
@@ -820,129 +642,17 @@ static void advertising_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
-/**@brief Function for initializing buttons and leds.
- *
- * @param[out] p_erase_bonds  Will be true if the clear bonding button was pressed to wake the application up.
- */
-static void buttons_leds_init(bool * p_erase_bonds)
-{
-    bsp_event_t startup_event;
-
-    uint32_t err_code = bsp_init(BSP_INIT_LED | BSP_INIT_BUTTONS,
-                                 APP_TIMER_TICKS(100, APP_TIMER_PRESCALER),
-                                 bsp_event_handler);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = bsp_btn_ble_init(NULL, &startup_event);
-    APP_ERROR_CHECK(err_code);
-
-    *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
-}
-
-
-/**@brief Function for placing the application in low power state while waiting for events.
- */
-static void power_manage(void)
-{
-    uint32_t err_code = sd_app_evt_wait();
-    APP_ERROR_CHECK(err_code);
-}
-/*
-static int* init_LED_array()
-{
-	int LRC_array[12];
-	LRC_array[0] = LROW_0;
-	LRC_array[1] = LROW_1;
-	LRC_array[2] = LROW_2;
-  LRC_array[3] = LCOL_0;
-	LRC_array[4] = LCOL_1;
-	LRC_array[5] = LCOL_2;
-	LRC_array[6] = LCOL_3;
-	LRC_array[7] = LCOL_4;
-	LRC_array[8] = LCOL_5;
-	LRC_array[9] = LCOL_6;
-	LRC_array[10] = LCOL_7;
-	LRC_array[11] = LCOL_8;
-	return LRC_array;
-}
-*/
-/*
-static void leds_init(void)
-{
-	  int* LRC_array = NULL;
-		int i =0;	
-	  //LRC_array = init_LED_array();
-	
-	  //for(i=0; i<= TOTAL_RC ;i++)
-	  //{
-		 // nrf_gpio_cfg_output(LRC_array[i]);
-			//nrf_gpio_pin_clear(LRC_array[i]);
-	  //}
-		
-	  nrf_gpio_cfg_output(LROW_0);
-	  nrf_gpio_cfg_output(LCOL_0);
-		nrf_gpio_cfg_input(BUTTON_A,NRF_GPIO_PIN_PULLUP);
-		nrf_gpio_cfg_input(BUTTON_B,NRF_GPIO_PIN_PULLUP);
-
-	  
-	  
-		//nrf_gpio_cfg_input(ADVERTISE_PIN,NRF_GPIO_PIN_PULLUP);	
-		
-	//	nrf_gpio_cfg(ADDR0_PIN, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-	//	nrf_gpio_cfg(ADDR1_PIN, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-	//	nrf_gpio_cfg(ADDR2_PIN, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-	
-		//nrf_gpio_cfg_input(ADDR0_PIN,NRF_GPIO_PIN_PULLUP);		
-		//nrf_gpio_cfg_input(ADDR1_PIN,NRF_GPIO_PIN_PULLUP);		
-		//nrf_gpio_cfg_input(ADDR2_PIN,NRF_GPIO_PIN_PULLUP);		
-}
-*/
-
-
-
-/**@brief Application main function.
- */
-
-/*
-void check_BLE_data()
-{
-	uint32_t temp =0;
-	temp = LED_value;
-	set_all_led_once(temp);
-	if(led_change == true)
-	{
-		led_change = false;
-		LED_control(rgb_value[0],rgb_value[1],rgb_value[2]);
-	}
-}
-*/
-
+//Initializing the values of SPI transfer buffer
 void init_temp_p_data()
 {
-	
-		temp_p_data[0]  = 0xCA;
-	  temp_p_data[1]  = 0xC1;
-	  temp_p_data[2]  = 0xC2;
-	  temp_p_data[3]  = 0xC3;
-		temp_p_data[4]  = 0xC4;
-	  temp_p_data[5]  = 0xC5;
-	  temp_p_data[6]  = 0xC6;
-	  temp_p_data[7]  = 0xC7;
-		temp_p_data[8]  = 0xC8;
-	  temp_p_data[9]  = 0xC9;
-	  temp_p_data[10] = 0xCA;
-	  temp_p_data[11] = 0xCB;
-		temp_p_data[12] = 0xCC;
-	  temp_p_data[13] = 0xCD;
-	  temp_p_data[14] = 0xCE;
-	  temp_p_data[15] = 0xCF;
-		temp_p_data[16] = 0xD0;
-		temp_p_data[17] = 0xD1;
-		temp_p_data[18] = 0xD2;
+	  uint8_t i =0;
+	  for(i=0;i<18;i++)
+	  {
+			temp_p_data[i]  = 0xCA + i ;   //Starts with set all 
+		}
 }
 
-
+//Check if the sound effect needs to be used based on connection and disconnection.
 void check_sound()
 {
 	if( sound_effect > 0)
@@ -951,28 +661,46 @@ void check_sound()
 		switch (sound_effect)
 		{ 
 			case SOUND_STARTUP:
-				buzzer_start_up();
+				buzzer_start_up();                                     //Start the buzzer
 				break;
 			case SOUND_CONNECTION:
-				buzzer_bluetooth_connection();
+				buzzer_bluetooth_connection();                         //Connection to the bluetooth sound
 				break;
 			case SOUND_DISCONNECTION:
-				buzzer_bluetooth_disconnection();
+				buzzer_bluetooth_disconnection();                      //Disconnection to the bluetooth sound
 				break;
 			default: 
 				break;
 	
 		}
+		sound_effect = 0;
 	}
-	sound_effect = 0;
 }
 
-uint8_t initials_name[3];
+bool rude_word_check()
+{
+	int i=0;
+	for(i=0;i<sizeof(first_letter);i++)
+	{
+		if(initials_name[0] == first_letter[i] )
+		{
+			if(initials_name[1] == second_letter[i])
+			{
+				if(initials_name[2] == third_letter[i] )
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
 
 
-
+// Use the Mac address to find the first three letters of the fancy name to prin on the LED screen.
 void getInitials_fancyName()
 {
+	  bool rude_word = true;
 	  ble_gap_addr_t 					mac;
     sd_ble_gap_address_get(&mac);
 		volatile uint32_t temp = 0;
@@ -983,16 +711,30 @@ void getInitials_fancyName()
     temp  |= (uint32_t)(mac.addr[2]&0x0F) << 16;	
 	  temp  |= (uint32_t)mac.addr[1] << 8;
 	  temp  |= (uint32_t)mac.addr[0];
+	
 		mod16  =  temp%16;
 	  top8   =  temp%256;
 	  mid6   =  (temp/256)%64;
     bot6   =	(temp/256)/64;
+		
 		initials_name[0] = name_first[top8 + mod16];
-    initials_name[1] = name_second[mid6 + mod16];
-	  initials_name[2] = name_third[bot6 + mod16];
+		initials_name[1] = name_second[mid6 + mod16];
+		initials_name[2] = name_third[bot6 + mod16];
+	
+		while(rude_word == true)
+	  {
+			rude_word = rude_word_check();
+			if(rude_word == true)
+			{
+				initials_name[0] = name_first[top8 + mod16];
+				initials_name[1] = name_second[(mid6 + mod16 + 1)%512];
+				initials_name[2] = name_third[bot6 + mod16];
+			}
+		}
 }
 
 
+//Based on the advertising check if the state of teh device is in advertising.
 void check_flashing()
 {
 	if(start_advertising_flashing == true)
@@ -1002,18 +744,11 @@ void check_flashing()
 	}
 	else if(stop_advertising_flashing == true)
 	{
-		stop_LEDarray_advertising();
+		stop_LEDarray_display();
 		stop_advertising_flashing = false;
 	}
 }
 
-void test_LED_init()
-{
-	nrf_gpio_cfg_output(TEST_PIN_1);
-	nrf_gpio_pin_clear(TEST_PIN_1);
-	nrf_gpio_cfg_output(TEST_PIN_2);
-	nrf_gpio_pin_clear(TEST_PIN_2);
-}
 
 
 int main(void)
@@ -1029,22 +764,24 @@ int main(void)
 	  init_buzzer();
 	  
 		//test_LED_init();
-	  //buzzer_HB_control(5);
-	  LEDS_PWM_init();
 	
+	  //LED attaced to microbit 2,3 are controlled through PWM
+	  LEDS_PWM_init();
+	  
+	  //Initilizing the data to be sent by SPI Master
 	  init_temp_p_data();
+	  //Intializing micro bit LED array
 	  init_micro_LEDs();
-			
+	  //Initlializin the timer to broadcast values 
+	  init_broadcast_timer();
+		//Initializing the I2C sensors on the microbit
 	  init_microbit_sensors();
 		
-	  //init_finch_LED();
-		//init_HM_LEDS();
-	  
+		
 		SPI_init();  
 
-		//Send Initial 
+		//Check if the device is a HummingBirdBit with microbit or just a microbit  
 		check_update_name();
-
 
 	  // Initialize.
     ble_stack_init();
@@ -1052,19 +789,20 @@ int main(void)
     services_init();
     advertising_init();
     conn_params_init();
-
+		
+		// Get the initials of the microbit and see if there are any badwords in it
 		getInitials_fancyName();
 		
-		
+		//Check if calibration has to be done 
 		start_check_update_calibrate();
-		//calibrate_compass();
-		//calibrate_compass();
-		//calibrate_compass();
 		
+		//Start LED adversting 
 		start_LEDarray_advertising();
-
+		
+		
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
+		
 		
     // Enter main loop.    
 		for (;;)
@@ -1073,7 +811,6 @@ int main(void)
 			check_flashing();
 			check_sound();
     }
-	
 }
 
 
