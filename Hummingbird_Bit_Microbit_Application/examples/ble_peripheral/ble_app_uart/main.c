@@ -65,13 +65,10 @@
 #include "app_uart.h"
 #include "app_util_platform.h"
 #include "app_pwm.h"
-
-
-
 #include "bsp.h"
 #include "bsp_btn_ble.h"
-#include "finch_pin.h"
-#include "finch_bsp.h"
+#include "micro_pin.h"
+//#include "finch_bsp.h"
 #include "nrf_delay.h"
 #include "SPI_master.h"
 #include "UART_SPI.h"
@@ -83,8 +80,9 @@
 #include "ledarray_map.h"
 #include "fstorage.h"
 #include "rude_words.h"
-
 #include  "f_save.h"
+
+/************************************************************************/
 
 uint8_t INITIAL_NAME[2] = {'M','B'};
 
@@ -125,7 +123,14 @@ uint8_t INITIAL_NAME[2] = {'M','B'};
 #define TEST_PIN_1 											18
 #define TEST_PIN_2 											1
 
-//#define INITIAL_LENGTH 									4
+
+#define SOUND_STARTUP         1 
+#define SOUND_CONNECTION      2
+#define SOUND_DISCONNECTION   3
+
+#define SENSORS_LENGTH  5
+
+/************************************************************************/
 
 ble_nus_t                               m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
@@ -139,7 +144,6 @@ volatile bool spi_xfer_done = true;
 
 uint16_t transmit_length = 0;
 
-
 APP_TIMER_DEF(transmit_timer_id);
 
 static bool first_byte = true;
@@ -149,15 +153,12 @@ volatile  uint32_t LED_value = 0;
 
 uint8_t    sensor_outputs[20];
 
-
 const char possible_names[] = {'F','N','H','M','F','L','H','B','B','2','C','3'};   //Just to be safe used A1,B2,C3
 char 	DEVICE_NAME [20];
-
 
 int mood_bit = 0;
 uint8_t temp_p_data[20];
 uint8_t temp_p_sensor_data[20];
-
 
 uint8_t buffer_data[255];
 volatile uint8_t tail_pointer = 0;
@@ -165,7 +166,6 @@ volatile uint8_t head_pointer = 0;
 
 volatile uint8_t rgb_value[3];
 uint8_t input_micro_packet[20];
-
 
 bool led_change = false;
 bool fake_firware_send = false;
@@ -176,21 +176,10 @@ bool stop_advertising_flashing   = false;
 
 bool LED_array_enable = true;
 
-
-
 uint8_t sound_effect =  0;
+uint8_t initials_name[4];
 
-
-#define SOUND_STARTUP         1 
-#define SOUND_CONNECTION      2
-#define SOUND_DISCONNECTION   3
-
-
-#define SENSORS_LENGTH  5
-
-
-uint8_t initials_name[3];
-
+/************************************************************************/
 
 
 /**@brief Function for assert macro callback.
@@ -210,8 +199,7 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 }
 
 
-
-
+/************************************************************************/
 /**@brief 		Function for converting Hex values to ASCII values
  * @param[in] Input in hex to be converted to ASCII
  * @return 		character which is an ascii value of the input
@@ -230,7 +218,7 @@ char convert_ascii(char input)
 	return output;
 }
 
-
+/************************************************************************/
 /**@brief 		Function for setting the device name  it either starts with HB or MB 
  *            the next five characters are taken from the last five hex values of MAC address
  *						followed by Null.
@@ -260,6 +248,16 @@ void set_devicename_array()
 }
 
 
+/************************************************************************/
+void update_name_disconnect()
+{
+	  uint32_t err_code = 0;
+	  check_update_name_disconnect();
+	  set_devicename_array();
+	  ble_gap_conn_sec_mode_t 	sec_mode;	
+	  err_code = sd_ble_gap_device_name_set(&sec_mode,(const uint8_t *) DEVICE_NAME,strlen(DEVICE_NAME));	
+}
+/************************************************************************/
 
 
 /**@brief Function for the GAP initialization.
@@ -267,6 +265,7 @@ void set_devicename_array()
  * @details This function will set up all the necessary GAP (Generic Access Profile) parameters of
  *          the device. It also sets the permissions and appearance.This is where initial GAPNAME is set
  */
+/************************************************************************/
 static void gap_params_init(void)
 {
     uint32_t                	err_code;
@@ -299,7 +298,7 @@ static void gap_params_init(void)
 
 }
 
-
+/************************************************************************/
 /**@brief Function for handling the data from the Nordic UART Service.
  *
  * @details This function will process the data received from the Nordic UART BLE Service and send
@@ -318,7 +317,7 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
 	    uint8_t start_add = 0;
 	    uint8_t temp_data[20];
 	  	transmit_length = length; 
-	    //nrf_gpio_pin_set(TEST_PIN_2);
+	   
 	    start_add  = tail_pointer;
 	    buffer_data[start_add] = length;
 	    uint8_t k=0;
@@ -336,10 +335,10 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
 				tail_pointer = 0;
 				head_pointer = 0;
 			}
-			//nrf_gpio_pin_clear(TEST_PIN_2);
+			
 }
 
-
+/************************************************************************/
 
 /**@snippet [Handling the data received over BLE] */
 /**@brief Function for initializing services that will be used by the application.
@@ -357,7 +356,7 @@ static void services_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
+/************************************************************************/
 /**@brief Function for handling an event from the Connection Parameters Module.
  *
  * @details This function will be called for all events in the Connection Parameters Module
@@ -372,15 +371,14 @@ static void services_init(void)
 static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
 {
     uint32_t err_code;
-
     if (p_evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED)
     {
         err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
-        APP_ERROR_CHECK(err_code);
+        //APP_ERROR_CHECK(err_code);
     }
 }
 
-
+/************************************************************************/
 /**@brief Function for handling errors from the Connection Parameters module.
  *
  * @param[in] nrf_error  Error code containing information about what went wrong.
@@ -390,7 +388,7 @@ static void conn_params_error_handler(uint32_t nrf_error)
     APP_ERROR_HANDLER(nrf_error);
 }
 
-
+/************************************************************************/
 /**@brief Function for initializing the Connection Parameters module.
  */
 static void conn_params_init(void)
@@ -414,7 +412,7 @@ static void conn_params_init(void)
 }
 
 
-
+/************************************************************************/
 /**@brief Function for handling advertising events.
  *
  * @details This function will be called for advertising events which are passed to the application.
@@ -438,7 +436,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 
 
 
-
+/************************************************************************/
 /**@brief Function for the application's SoftDevice event handler.
  *
  * @param[in] p_ble_evt SoftDevice event. Sound of connetcion and disconnetion and starting of LED advertiding flashing .
@@ -536,7 +534,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     }
 }
 
-
+/************************************************************************/
 /**@brief Function for dispatching a SoftDevice event to all modules with a SoftDevice
  *        event handler.
  *
@@ -554,7 +552,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 }
 
 
-
+/************************************************************************/
 /**@brief Function for dispatching a system event to interested modules.
  *
  * @details This function is called from the System event interrupt handler after a system
@@ -569,7 +567,7 @@ static void sys_evt_dispatch(uint32_t sys_evt)
 
 
 		
-
+/************************************************************************/
 /**@brief Function for the SoftDevice initialization.
  *
  * @details This function initializes the SoftDevice and the BLE event interrupt.
@@ -611,7 +609,7 @@ static void ble_stack_init(void)
 
 
 
-
+/************************************************************************/
 /**@brief Function for initializing the Advertising functionality.
  */
 static void advertising_init(void)
@@ -642,6 +640,8 @@ static void advertising_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+
+/************************************************************************/
 //Initializing the values of SPI transfer buffer
 void init_temp_p_data()
 {
@@ -652,17 +652,15 @@ void init_temp_p_data()
 		}
 }
 
+
+/************************************************************************/
 //Check if the sound effect needs to be used based on connection and disconnection.
 void check_sound()
 {
 	if( sound_effect > 0)
 	{
-		
 		switch (sound_effect)
 		{ 
-			case SOUND_STARTUP:
-				buzzer_start_up();                                     //Start the buzzer
-				break;
 			case SOUND_CONNECTION:
 				buzzer_bluetooth_connection();                         //Connection to the bluetooth sound
 				break;
@@ -671,12 +669,13 @@ void check_sound()
 				break;
 			default: 
 				break;
-	
 		}
 		sound_effect = 0;
+		update_name_disconnect();
 	}
 }
 
+/************************************************************************/
 bool rude_word_check()
 {
 	int i=0;
@@ -696,8 +695,9 @@ bool rude_word_check()
 	return false;
 }
 
-
-// Use the Mac address to find the first three letters of the fancy name to prin on the LED screen.
+/************************************************************************/
+// Use the Mac address to find the first three letters of the fancy name to prin on the LED screen
+// Check if the three letter word matches the rude words and if yes change the word
 void getInitials_fancyName()
 {
 	  bool rude_word = true;
@@ -732,7 +732,7 @@ void getInitials_fancyName()
 			}
 		}
 }
-
+/************************************************************************/
 
 //Based on the advertising check if the state of teh device is in advertising.
 void check_flashing()
@@ -748,9 +748,10 @@ void check_flashing()
 		stop_advertising_flashing = false;
 	}
 }
+/************************************************************************/
 
 
-
+/************************************************************************/
 int main(void)
 {
 	
@@ -764,10 +765,10 @@ int main(void)
 	  init_buzzer();
 	  
 		//test_LED_init();
-	
 	  //LED attaced to microbit 2,3 are controlled through PWM
 	  LEDS_PWM_init();
 	  
+		
 	  //Initilizing the data to be sent by SPI Master
 	  init_temp_p_data();
 	  //Intializing micro bit LED array
@@ -795,15 +796,13 @@ int main(void)
 		
 		//Check if calibration has to be done 
 		start_check_update_calibrate();
-		
+
 		//Start LED adversting 
 		start_LEDarray_advertising();
 		
 		
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
-		
-		
     // Enter main loop.    
 		for (;;)
     {
@@ -814,6 +813,3 @@ int main(void)
 }
 
 
-/**
- * @}
- */
