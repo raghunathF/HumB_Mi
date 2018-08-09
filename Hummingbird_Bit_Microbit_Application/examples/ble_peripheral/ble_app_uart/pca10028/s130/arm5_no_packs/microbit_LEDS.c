@@ -29,7 +29,7 @@ static uint8_t temp_value_bitmap = 0;
 static uint32_t micro_led_value = 0 ;
 static bool advertising_string = true;
 
-bool flash_mb = false;
+extern bool flash_mb;
 
 uint32_t current_flash_bitmap[40]; 
 uint8_t length_flash = 0;
@@ -72,6 +72,7 @@ void update_flash_array(uint8_t* char_array , uint8_t length )
 	current_flash_bitmap[length*2]     = 0x00000000;                         //Blank after every word
 	current_flash_bitmap[length*2+1]   = 0x00000000;                         //Blank after every word
 	length_flash = length*2 + 2;
+	temp_value_bitmap = 0;
 	
 }
 
@@ -79,6 +80,7 @@ void update_flash_array(uint8_t* char_array , uint8_t length )
 /************************************************************************/
 void start_flashing_string()
 {
+	
 	start_flashing_timer();
 	LED_array_enable = true;
 }

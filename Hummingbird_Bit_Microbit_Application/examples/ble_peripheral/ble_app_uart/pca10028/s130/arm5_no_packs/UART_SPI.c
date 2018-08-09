@@ -24,6 +24,7 @@
 #include "microbit_LEDS.h"
 
 /************************************************************************/
+extern bool flash_mb ;
 extern ble_nus_t   m_nus;
 APP_TIMER_DEF(broadcast_timer_id);
 
@@ -309,6 +310,11 @@ void uart_spi_bridge()
 					{
 						temp_1 = current_command[i];
 						temp   = temp | temp_1<<(24-8*(i-2));
+					}
+					if(flash_mb = true)
+					{
+						flash_mb  = false;
+						stop_flashing_timer();
 					}
 					LED_micro_control(temp,0x55);
 				}
