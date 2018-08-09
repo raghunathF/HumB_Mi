@@ -21,3 +21,10 @@ Hummingbird_Bit_Microbit_Application\examples\ble_peripheral\ble_app_uart\pca100
 Hex File : https://www.segger.com/downloads/jlink#BBC_microbit
 
 3. Connect the micro:bit to the your laptop/PC , first flash the softdevice and then flash the application to the micro:bit
+
+
+License:
+
+1.The github repo license is applied to our work  which is in Hummingbird_Bit_Microbit_Application\examples\ble_peripheral\ble_app_uart\pca10028\s130\arm5_no_packs
+
+2.Other files are according to the license in Hummingbird_Bit_Application which is provided by Nordic Semiconductors.
