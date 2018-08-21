@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\_build\nrf51422_xxac.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\_build\nrf51422_xxac.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Thu Aug 09 10:16:35 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Tue Aug 21 09:56:11 2018
 <BR><P>
 <H3>Maximum Stack Usage =        492 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -499,7 +499,7 @@ Global Symbols
 <LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_verify_offset_mag
 <LI><a href="#[11d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_sensor_data_mma
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_sensor_data_mag
-<LI><a href="#[124]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
+<LI><a href="#[125]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
 <LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_timeouts_check
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;intern_softdevice_events_execute
 <LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SWI2_IRQHandler
@@ -622,7 +622,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_HB_control
 <LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_micro_control
 <LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;broadcast_start
-<LI><a href="#[124]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
+<LI><a href="#[125]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;conn_params_negotiation
 </UL>
 
@@ -631,7 +631,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;timer_stop_op_schedule
 </UL>
-<BR>[Called By]<UL><LI><a href="#[127]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stop_flashing_timer
+<BR>[Called By]<UL><LI><a href="#[124]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stop_flashing_timer
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_HB_control
 <LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_micro_control
 <LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stop_LEDarray_display
@@ -899,7 +899,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fstorage_erase
 </UL>
 
-<P><STRONG><a name="[125]"></a>fs_init</STRONG> (Thumb, 154 bytes, Stack size 20 bytes, fstorage.o(i.fs_init))
+<P><STRONG><a name="[126]"></a>fs_init</STRONG> (Thumb, 154 bytes, Stack size 20 bytes, fstorage.o(i.fs_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = fs_init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_check_update_calibrate
@@ -1610,11 +1610,12 @@ Global Symbols
 <P><STRONG><a name="[24]"></a>spi_event_handler</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, spi_master.o(i.spi_event_handler))
 <BR>[Address Reference Count : 1]<UL><LI> spi_master.o(i.SPI_init)
 </UL>
-<P><STRONG><a name="[be]"></a>start_LEDarray_advertising</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, microbit_leds.o(i.start_LEDarray_advertising))
-<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = start_LEDarray_advertising &rArr; start_flashing_timer &rArr; app_timer_start &rArr; app_util_critical_region_enter
+<P><STRONG><a name="[be]"></a>start_LEDarray_advertising</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, microbit_leds.o(i.start_LEDarray_advertising))
+<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = start_LEDarray_advertising &rArr; stop_flashing_timer &rArr; app_timer_stop &rArr; timer_stop_op_schedule &rArr; app_util_critical_region_enter
 </UL>
 <BR>[Calls]<UL><LI><a href="#[123]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_flash_array
-<LI><a href="#[124]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
+<LI><a href="#[124]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stop_flashing_timer
+<LI><a href="#[125]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
 </UL>
 <BR>[Called By]<UL><LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_flashing
@@ -1623,7 +1624,7 @@ Global Symbols
 <P><STRONG><a name="[f4]"></a>start_check_update_calibrate</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, f_save.o(i.start_check_update_calibrate))
 <BR><BR>[Stack]<UL><LI>Max Depth = 228<LI>Call Chain = start_check_update_calibrate &rArr; write_offset &rArr; nrf_drv_twi_tx &rArr; nrf_drv_twi_xfer &rArr; twi_xfer &rArr; twi_tx_start_transfer &rArr; twi_transfer &rArr; twi_send_byte
 </UL>
-<BR>[Calls]<UL><LI><a href="#[125]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fs_init
+<BR>[Calls]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fs_init
 <LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_calib_values
 <LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_calibrate
 <LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;write_offset
@@ -1632,21 +1633,21 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[126]"></a>start_flashing_string</STRONG> (Thumb, 14 bytes, Stack size 8 bytes, microbit_leds.o(i.start_flashing_string))
+<P><STRONG><a name="[127]"></a>start_flashing_string</STRONG> (Thumb, 14 bytes, Stack size 8 bytes, microbit_leds.o(i.start_flashing_string))
 <BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = start_flashing_string &rArr; start_flashing_timer &rArr; app_timer_start &rArr; app_util_critical_region_enter
 </UL>
-<BR>[Calls]<UL><LI><a href="#[124]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
+<BR>[Calls]<UL><LI><a href="#[125]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_timer
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_spi_bridge
 </UL>
 
-<P><STRONG><a name="[124]"></a>start_flashing_timer</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, microbit_leds.o(i.start_flashing_timer))
+<P><STRONG><a name="[125]"></a>start_flashing_timer</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, microbit_leds.o(i.start_flashing_timer))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = start_flashing_timer &rArr; app_timer_start &rArr; app_util_critical_region_enter
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_timer_start
 <LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_error_handler_bare
 </UL>
-<BR>[Called By]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_string
+<BR>[Called By]<UL><LI><a href="#[127]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_string
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_LEDarray_advertising
 </UL>
 
@@ -1661,12 +1662,13 @@ Global Symbols
 <LI><a href="#[2d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;micro_LED_flash_handler
 </UL>
 
-<P><STRONG><a name="[127]"></a>stop_flashing_timer</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, microbit_leds.o(i.stop_flashing_timer))
+<P><STRONG><a name="[124]"></a>stop_flashing_timer</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, microbit_leds.o(i.stop_flashing_timer))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = stop_flashing_timer &rArr; app_timer_stop &rArr; timer_stop_op_schedule &rArr; app_util_critical_region_enter
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_timer_stop
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_spi_bridge
+<LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_LEDarray_advertising
 </UL>
 
 <P><STRONG><a name="[4d]"></a>switch_off_leds</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, microbit_leds.o(i.switch_off_leds))
@@ -1705,13 +1707,13 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_mma_mag
 </UL>
 
-<P><STRONG><a name="[f5]"></a>uart_spi_bridge</STRONG> (Thumb, 578 bytes, Stack size 24 bytes, uart_spi.o(i.uart_spi_bridge))
+<P><STRONG><a name="[f5]"></a>uart_spi_bridge</STRONG> (Thumb, 600 bytes, Stack size 24 bytes, uart_spi.o(i.uart_spi_bridge))
 <BR><BR>[Stack]<UL><LI>Max Depth = 332<LI>Call Chain = uart_spi_bridge &rArr; calibrate_compass &rArr; write_offset &rArr; nrf_drv_twi_tx &rArr; nrf_drv_twi_xfer &rArr; twi_xfer &rArr; twi_tx_start_transfer &rArr; twi_transfer &rArr; twi_send_byte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[123]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_flash_array
 <LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfer_data
-<LI><a href="#[127]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stop_flashing_timer
-<LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_string
+<LI><a href="#[124]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stop_flashing_timer
+<LI><a href="#[127]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;start_flashing_string
 <LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_data_packet
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;read_data
 <LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calibrate_compass

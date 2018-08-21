@@ -27,7 +27,144 @@ Project File Date:  08/08/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'nrf51422_xxac'
-".\_build\nrf51422_xxac.axf" - 0 Error(s), 0 Warning(s).
+compiling UART_SPI.c...
+UART_SPI.h(25): warning:  #1295-D: Deprecated declaration uart_spi_bridge - give arg types
+  void uart_spi_bridge();
+UART_SPI.h(26): warning:  #1295-D: Deprecated declaration check_update_name - give arg types
+  void check_update_name();
+UART_SPI.h(27): warning:  #1295-D: Deprecated declaration check_update_name_disconnect - give arg types
+  void check_update_name_disconnect();
+UART_SPI.h(28): warning:  #1295-D: Deprecated declaration init_broadcast_timer - give arg types
+  void init_broadcast_timer();
+UART_SPI.h(29): warning:  #1295-D: Deprecated declaration broadcast_stop - give arg types
+  void  broadcast_stop();
+UART_SPI.h(30): warning:  #1295-D: Deprecated declaration broadcast_timer_start - give arg types
+  void broadcast_timer_start();
+SPI_master.h(17): warning:  #1295-D: Deprecated declaration read_data - give arg types
+  void read_data();
+SPI_master.h(18): warning:  #1295-D: Deprecated declaration SPI_init - give arg types
+  void SPI_init();
+HM_LEDS.h(12): warning:  #1295-D: Deprecated declaration LEDS_PWM_init - give arg types
+  void LEDS_PWM_init();
+microbit_LEDS.h(11): warning:  #1295-D: Deprecated declaration stop_flashing_timer - give arg types
+  void stop_flashing_timer();
+microbit_LEDS.h(12): warning:  #1295-D: Deprecated declaration start_LEDarray_advertising - give arg types
+  void start_LEDarray_advertising();
+microbit_LEDS.h(13): warning:  #1295-D: Deprecated declaration stop_LEDarray_display - give arg types
+  void stop_LEDarray_display();
+microbit_LEDS.h(14): warning:  #1295-D: Deprecated declaration init_micro_LEDs - give arg types
+  void init_micro_LEDs();
+microbit_LEDS.h(18): warning:  #1295-D: Deprecated declaration start_flashing_string - give arg types
+  void start_flashing_string();
+micro_bit_sensors.h(90): warning:  #1295-D: Deprecated declaration read_data_packet - give arg types
+  void read_data_packet();
+micro_bit_sensors.h(92): warning:  #1295-D: Deprecated declaration calibrate_compass - give arg types
+  void calibrate_compass();
+micro_bit_sensors.h(93): warning:  #1-D: last line of file ends without a newline
+  void write_offset(uint8_t* offset);
+buzzer.h(9): warning:  #1295-D: Deprecated declaration init_buzzer - give arg types
+  void init_buzzer();
+microbit_LEDS.h(11): warning:  #1295-D: Deprecated declaration stop_flashing_timer - give arg types
+  void stop_flashing_timer();
+microbit_LEDS.h(12): warning:  #1295-D: Deprecated declaration start_LEDarray_advertising - give arg types
+  void start_LEDarray_advertising();
+microbit_LEDS.h(13): warning:  #1295-D: Deprecated declaration stop_LEDarray_display - give arg types
+  void stop_LEDarray_display();
+microbit_LEDS.h(14): warning:  #1295-D: Deprecated declaration init_micro_LEDs - give arg types
+  void init_micro_LEDs();
+microbit_LEDS.h(18): warning:  #1295-D: Deprecated declaration start_flashing_string - give arg types
+  void start_flashing_string();
+UART_SPI.c(102): warning:  #550-D: variable "err_code"  was set but never used
+  	uint32_t err_code;
+UART_SPI.c(144): warning:  #177-D: variable "i"  was declared but never referenced
+  	uint32_t i =0;
+UART_SPI.c(210): warning:  #167-D: argument of type "void (*)()" is incompatible with parameter of type "app_timer_timeout_handler_t"
+  	 err_code = app_timer_create(&broadcast_timer_id,APP_TIMER_MODE_REPEATED,broadcast_timer_handler);
+UART_SPI.c(67): warning:  #177-D: function "send_fake_firmware_number"  was declared but never referenced
+  static void send_fake_firmware_number()
+UART_SPI.c: 27 warnings, 0 errors
+compiling main.c...
+..\arm5_no_packs\SPI_master.h(17): warning:  #1295-D: Deprecated declaration read_data - give arg types
+  void read_data();
+..\arm5_no_packs\SPI_master.h(18): warning:  #1295-D: Deprecated declaration SPI_init - give arg types
+  void SPI_init();
+..\arm5_no_packs\UART_SPI.h(25): warning:  #1295-D: Deprecated declaration uart_spi_bridge - give arg types
+  void uart_spi_bridge();
+..\arm5_no_packs\UART_SPI.h(26): warning:  #1295-D: Deprecated declaration check_update_name - give arg types
+  void check_update_name();
+..\arm5_no_packs\UART_SPI.h(27): warning:  #1295-D: Deprecated declaration check_update_name_disconnect - give arg types
+  void check_update_name_disconnect();
+..\arm5_no_packs\UART_SPI.h(28): warning:  #1295-D: Deprecated declaration init_broadcast_timer - give arg types
+  void init_broadcast_timer();
+..\arm5_no_packs\UART_SPI.h(29): warning:  #1295-D: Deprecated declaration broadcast_stop - give arg types
+  void  broadcast_stop();
+..\arm5_no_packs\UART_SPI.h(30): warning:  #1295-D: Deprecated declaration broadcast_timer_start - give arg types
+  void broadcast_timer_start();
+..\arm5_no_packs\HM_LEDS.h(12): warning:  #1295-D: Deprecated declaration LEDS_PWM_init - give arg types
+  void LEDS_PWM_init();
+..\arm5_no_packs\microbit_LEDS.h(11): warning:  #1295-D: Deprecated declaration stop_flashing_timer - give arg types
+  void stop_flashing_timer();
+..\arm5_no_packs\microbit_LEDS.h(12): warning:  #1295-D: Deprecated declaration start_LEDarray_advertising - give arg types
+  void start_LEDarray_advertising();
+..\arm5_no_packs\microbit_LEDS.h(13): warning:  #1295-D: Deprecated declaration stop_LEDarray_display - give arg types
+  void stop_LEDarray_display();
+..\arm5_no_packs\microbit_LEDS.h(14): warning:  #1295-D: Deprecated declaration init_micro_LEDs - give arg types
+  void init_micro_LEDs();
+..\arm5_no_packs\microbit_LEDS.h(18): warning:  #1295-D: Deprecated declaration start_flashing_string - give arg types
+  void start_flashing_string();
+..\arm5_no_packs\micro_bit_sensors.h(90): warning:  #1295-D: Deprecated declaration read_data_packet - give arg types
+  void read_data_packet();
+..\arm5_no_packs\micro_bit_sensors.h(92): warning:  #1295-D: Deprecated declaration calibrate_compass - give arg types
+  void calibrate_compass();
+..\arm5_no_packs\micro_bit_sensors.h(93): warning:  #1-D: last line of file ends without a newline
+  void write_offset(uint8_t* offset);
+..\arm5_no_packs\buzzer.h(9): warning:  #1295-D: Deprecated declaration init_buzzer - give arg types
+  void init_buzzer();
+..\arm5_no_packs\sound_buzzer.h(4): warning:  #1295-D: Deprecated declaration buzzer_bluetooth_connection - give arg types
+  void buzzer_bluetooth_connection();
+..\arm5_no_packs\sound_buzzer.h(5): warning:  #1-D: last line of file ends without a newline
+  void buzzer_bluetooth_disconnection();
+..\arm5_no_packs\sound_buzzer.h(5): warning:  #1295-D: Deprecated declaration buzzer_bluetooth_disconnection - give arg types
+  void buzzer_bluetooth_disconnection();
+..\arm5_no_packs\f_save.h(7): warning:  #1295-D: Deprecated declaration read_calib_values - give arg types
+  uint16_t* read_calib_values();
+..\arm5_no_packs\f_save.h(8): warning:  #1-D: last line of file ends without a newline
+  void start_check_update_calibrate();
+..\arm5_no_packs\f_save.h(8): warning:  #1295-D: Deprecated declaration start_check_update_calibrate - give arg types
+  void start_check_update_calibrate();
+..\..\..\main.c(212): warning:  #186-D: pointless comparison of unsigned integer with zero
+  	if(input >= 0 & input <=9)
+..\..\..\main.c(256): warning:  #550-D: variable "err_code"  was set but never used
+  	  uint32_t err_code = 0;
+..\..\..\main.c(277): warning:  #177-D: variable "addr_byte"  was declared but never referenced
+  		uint8_t 									addr_byte	 = 0;
+..\..\..\main.c(320): warning:  #177-D: variable "temp_data"  was declared but never referenced
+  	    uint8_t temp_data[20];
+..\..\..\main.c(375): warning:  #550-D: variable "err_code"  was set but never used
+      uint32_t err_code;
+..\..\..\main.c(426): warning:  #177-D: variable "err_code"  was declared but never referenced
+      uint32_t err_code;
+..\..\..\main.c(761): warning:  #177-D: variable "erase_bonds"  was declared but never referenced
+      bool erase_bonds;
+..\..\..\main.c(762): warning:  #177-D: variable "first_time"  was declared but never referenced
+  	  static bool first_time = false;
+..\..\..\main.c(763): warning:  #177-D: variable "count_broadcast"  was declared but never referenced
+  		static uint16_t count_broadcast = 0;
+..\..\..\main.c(139): warning:  #177-D: variable "index"  was declared but never referenced
+  static uint8_t index = 0;
+..\..\..\main.c(147): warning:  #177-D: variable "transmit_timer_id"  was declared but never referenced
+  APP_TIMER_DEF(transmit_timer_id);
+..\..\..\main.c(149): warning:  #177-D: variable "first_byte"  was declared but never referenced
+  static bool first_byte = true;
+..\..\..\main.c(150): warning:  #177-D: variable "length_receive"  was declared but never referenced
+  static uint8_t length_receive = 0 ;
+..\..\..\main.c(151): warning:  #177-D: variable "data_array"  was declared but never referenced
+  static uint8_t data_array[BLE_NUS_MAX_DATA_LEN];
+..\..\..\main.c: 38 warnings, 0 errors
+linking...
+Program Size: Code=22292 RO-data=2972 RW-data=352 ZI-data=6136  
+FromELF: creating hex file...
+".\_build\nrf51422_xxac.axf" - 0 Error(s), 65 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -54,10 +191,10 @@ Package Vendor: NordicSemiconductor
    * Component: ARM::CMSIS:CORE:4.3.0
 
    * Component: NordicSemiconductor::Device:Startup:8.11.1
-      Source file:   Device\Source\arm\arm_startup_nrf51.s
       Include file:  Device\Include\system_nrf51.h
+      Source file:   Device\Source\arm\arm_startup_nrf51.s
       Source file:   Device\Source\system_nrf51.c
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>

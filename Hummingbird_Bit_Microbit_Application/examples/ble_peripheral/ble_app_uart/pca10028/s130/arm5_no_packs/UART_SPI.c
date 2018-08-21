@@ -213,7 +213,7 @@ void init_broadcast_timer(void * p_context)
 }
 
 /************************************************************************
-Broadcast timer iwill be called every 30msecs
+Broadcast timer will be called every 30msecs
 ************************************************************************/
 void broadcast_start()
 {
@@ -311,7 +311,7 @@ void uart_spi_bridge()
 						temp_1 = current_command[i];
 						temp   = temp | temp_1<<(24-8*(i-2));
 					}
-					if(flash_mb = true)
+					if(flash_mb == true)
 					{
 						flash_mb  = false;
 						stop_flashing_timer();
@@ -364,6 +364,8 @@ void uart_spi_bridge()
 		 {
 				 broadcast_flag = false;
 				 buzzer_HB_control(0,0);
+				 LED_HB_control(LED2 ,0);
+			   LED_HB_control(LED3 ,0);
 			   stop_LEDarray_display();
 				 nrf_delay_ms(1);
 				 transfer_data(LENGTH_OTHER_SPI,current_command);

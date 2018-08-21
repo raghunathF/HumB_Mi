@@ -100,6 +100,11 @@ void start_LEDarray_advertising()
 {
 	initials_name[3] = 0x00;
 	update_flash_array(initials_name,4);           //Grab the intials for the advertisiment
+	if(flash_mb == true)
+	{
+		flash_mb = false;
+		stop_flashing_timer();
+	}
 	start_flashing_timer();
 	advertising_string = true;
 	LED_array_enable   = true;

@@ -176,6 +176,8 @@ bool stop_advertising_flashing   = false;
 
 bool LED_array_enable = true;
 
+bool flash_mb = true;
+
 uint8_t sound_effect =  0;
 uint8_t initials_name[4];
 
@@ -733,7 +735,6 @@ void getInitials_fancyName()
 		}
 }
 /************************************************************************/
-
 //Based on the advertising check if the state of teh device is in advertising.
 void check_flashing()
 {
@@ -748,6 +749,7 @@ void check_flashing()
 		stop_advertising_flashing = false;
 	}
 }
+
 /************************************************************************/
 
 
@@ -773,7 +775,7 @@ int main(void)
 	  init_temp_p_data();
 	  //Intializing micro bit LED array
 	  init_micro_LEDs();
-	  //Initlializin the timer to broadcast values 
+	  //Initlializing the timer to broadcast values 
 	  init_broadcast_timer();
 		//Initializing the I2C sensors on the microbit
 	  init_microbit_sensors();
