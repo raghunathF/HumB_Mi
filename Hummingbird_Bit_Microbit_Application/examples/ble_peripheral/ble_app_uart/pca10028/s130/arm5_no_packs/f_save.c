@@ -133,13 +133,9 @@ void start_check_update_calibrate()
 	uint16_t* offset_values = NULL;
 	static uint8_t  offset[6] ;
 	uint8_t i =0;
-	
 	bool calibrate_flag = false;
 	init_fstorage();
-	
 	calibrate_flag = check_calibrate();
-	
-	
 	if(calibrate_flag == true)
 	{
 		offset_values = read_calib_values();
@@ -148,9 +144,11 @@ void start_check_update_calibrate()
 			offset[i*2]   =  (offset_values[i] & 0xFF00)>>8;
 			offset[i*2+1] =  (offset_values[i] & 0x00FF);
 		}
-		
+		check_write_offset(offset);
+		/*
 	  write_offset(offset);
 	  read_verify_offset_mag();
+		*/
 	}
 	
 }

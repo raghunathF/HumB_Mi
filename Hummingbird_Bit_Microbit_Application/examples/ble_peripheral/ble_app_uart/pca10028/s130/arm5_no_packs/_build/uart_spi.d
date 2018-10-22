@@ -50,3 +50,4 @@
 .\_build\uart_spi.o: micro_bit_sensors.h
 .\_build\uart_spi.o: buzzer.h
 .\_build\uart_spi.o: microbit_LEDS.h
+.\_build\uart_spi.o: microbit_io_pwm.h

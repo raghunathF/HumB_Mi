@@ -20,6 +20,7 @@ extern uint8_t buffer_data[255];
 extern bool app_selected;
 extern uint16_t transmit_length;
 extern uint8_t    sensor_outputs[20];
+extern uint8_t prev_state;
 /************************************************************************/
 
 void uart_spi_bridge();

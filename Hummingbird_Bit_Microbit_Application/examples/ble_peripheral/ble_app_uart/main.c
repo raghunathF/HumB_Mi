@@ -68,7 +68,6 @@
 #include "bsp.h"
 #include "bsp_btn_ble.h"
 #include "micro_pin.h"
-//#include "finch_bsp.h"
 #include "nrf_delay.h"
 #include "SPI_master.h"
 #include "UART_SPI.h"
@@ -120,7 +119,7 @@ uint8_t INITIAL_NAME[2] = {'M','B'};
 #define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
 #define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
 
-#define TEST_PIN_1 											18
+#define TEST_PIN_1 											18                                           /**Debug test pins **/    
 #define TEST_PIN_2 											1
 
 
@@ -129,6 +128,9 @@ uint8_t INITIAL_NAME[2] = {'M','B'};
 #define SOUND_DISCONNECTION   3
 
 #define SENSORS_LENGTH  5
+
+#define HUMMINGBIRD_BIT   0
+#define MICRO_BIT 			  1
 
 /************************************************************************/
 
@@ -145,6 +147,7 @@ volatile bool spi_xfer_done = true;
 uint16_t transmit_length = 0;
 
 APP_TIMER_DEF(transmit_timer_id);
+
 
 static bool first_byte = true;
 static uint8_t length_receive = 0 ;
@@ -180,6 +183,11 @@ bool flash_mb = true;
 
 uint8_t sound_effect =  0;
 uint8_t initials_name[4];
+uint8_t prev_state = 0;
+bool buzzer_progress = false;
+
+
+
 
 /************************************************************************/
 
@@ -659,21 +667,25 @@ void init_temp_p_data()
 //Check if the sound effect needs to be used based on connection and disconnection.
 void check_sound()
 {
-	if( sound_effect > 0)
+	if(prev_state == HUMMINGBIRD_BIT)
 	{
-		switch (sound_effect)
-		{ 
-			case SOUND_CONNECTION:
-				buzzer_bluetooth_connection();                         //Connection to the bluetooth sound
-				break;
-			case SOUND_DISCONNECTION:
-				buzzer_bluetooth_disconnection();                      //Disconnection to the bluetooth sound
-				break;
-			default: 
-				break;
+		if( sound_effect > 0)
+		{
+			switch (sound_effect)
+			{ 
+				case SOUND_CONNECTION:
+					buzzer_bluetooth_connection();                         //Connection to the bluetooth sound
+					break;
+				case SOUND_DISCONNECTION:
+					buzzer_bluetooth_disconnection();                      //Disconnection to the bluetooth sound
+					break;
+				default: 
+					break;
+			}
+			update_name_disconnect();
+			sound_effect = 0;
+			
 		}
-		sound_effect = 0;
-		update_name_disconnect();
 	}
 }
 
@@ -750,7 +762,6 @@ void check_flashing()
 	}
 }
 
-/************************************************************************/
 
 
 /************************************************************************/
@@ -762,30 +773,25 @@ int main(void)
 	  static bool first_time = false;
 		static uint16_t count_broadcast = 0;
 		LED_value = 0x0055555555;
-		
 	  APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
-	  init_buzzer();
 	  
-		//test_LED_init();
-	  //LED attaced to microbit 2,3 are controlled through PWM
-	  LEDS_PWM_init();
-	  
-		
+	  init_timer_buzzer();
 	  //Initilizing the data to be sent by SPI Master
 	  init_temp_p_data();
 	  //Intializing micro bit LED array
 	  init_micro_LEDs();
 	  //Initlializing the timer to broadcast values 
 	  init_broadcast_timer();
-		//Initializing the I2C sensors on the microbit
+		
 	  init_microbit_sensors();
-		
-		
 		SPI_init();  
-
+	
+		//Initialize PWM module
+		LEDS_PWM_init();
+		
 		//Check if the device is a HummingBirdBit with microbit or just a microbit  
 		check_update_name();
-
+		
 	  // Initialize.
     ble_stack_init();
     gap_params_init();
@@ -798,10 +804,11 @@ int main(void)
 		
 		//Check if calibration has to be done 
 		start_check_update_calibrate();
+		
+		//Initializing the I2C sensors on the microbit
 
 		//Start LED adversting 
 		start_LEDarray_advertising();
-		
 		
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);

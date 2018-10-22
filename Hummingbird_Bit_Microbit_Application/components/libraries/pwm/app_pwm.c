@@ -618,7 +618,9 @@ ret_code_t app_pwm_channel_duty_ticks_set(app_pwm_t const * const p_instance,
     }
     if (app_pwm_busy_check(p_instance))
     {
-        return NRF_ERROR_BUSY;  // PPI channels for synchronization are still in use.
+			  nrf_drv_timer_clear(p_instance->p_timer);
+        
+			  //return NRF_ERROR_BUSY;  // PPI channels for synchronization are still in use.
     }
 
     m_pwm_busy[p_instance->p_timer->instance_id] = BUSY_STATE_CHANGING;

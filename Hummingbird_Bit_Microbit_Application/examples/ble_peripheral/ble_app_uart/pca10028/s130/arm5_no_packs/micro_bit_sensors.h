@@ -12,6 +12,13 @@
 /* Common addresses definition for temperature sensor. */
 #define MMA_ADDR          (0x3AU >> 1)
 #define MAG_ADDR          (0x1CU >> 1)
+#define LS_MAG_ADDR       (0x3CU >> 1)
+#define LS_MMA_ADDR       (0x32U >> 1)
+
+
+#define MAG_WHO_AM_I_VALUE			0xC4
+#define LS_MAG_WHO_AM_I_VALUE		0x40
+
 
 #define MMA_REG_CTRL1  				 0x2A
 #define MMA_REG_WHO_AM_I       0x0D
@@ -31,8 +38,6 @@ static volatile bool m_xfer_done = false;
 /* Buffer for samples read from temperature sensor. */
 static uint8_t m_sample;
 
-
-
 //
 
 /**
@@ -40,6 +45,7 @@ static uint8_t m_sample;
  */
 #define STANDBY_MODE 					0
 #define ACTIVE_MODE						0x21
+
 
 
 //
@@ -72,17 +78,49 @@ static uint8_t m_sample;
 
 #define LENGTH_AXIS_DATA 			7
 #define LENGTH_SHAKE_DATA 		1
-
+#define LENGTH_READ_WHO_AM_I  1
 
 #define MAG_REG_STATUS 				0x00
 #define MAG_REG_TEMP 					0x0F
 #define LENGTH_TEMP_DATA 			1
 
-
 #define MAG_INT_1_PIN	  			27
 #define ACCL_INT_1_PIN				28
 #define ACCL_INT_2_PIN				29
 
+#define MAG_INT_1_PIN_LS	  	29
+#define ACCL_INT_1_PIN_LS			28
+
+#define MAG_CFG_REG_A_LS      0x60
+#define MAG_CFG_REG_B_LS			0x61
+#define MAG_CFG_REG_C_LS			0x62
+
+#define MMA_REG_CTRL1_LS      0x20
+#define MMA_REG_CTRL4_LS      0x23
+#define MMA_REG_SHAKE_THS_LS  0x32
+
+#define STANDBY_MODE_LS       0x00
+#define ACTIVE_MODE_LS        0x27
+#define SHAKE_TH_LS           0x50
+#define CTRL4_VALUE_LS        0x80
+
+#define MMA_REG_STATUS_LS     		0xA8
+#define MMA_REG_SHAKE_STATUS_LS		0x31
+
+
+#define MMA_REG_SHAKE_CONFIG_LS   0x30
+#define XYZ_SHAKE_ENABLE_LS				0x2A
+
+#define CFG_A_VALUE_S         0x00
+#define CFG_B_VALUE_S         0x02
+#define CFG_C_VALUE_S         0x08
+
+#define MAG_REG_STATUS_LS 				0x67
+#define MAG_REG_OFFSET_X_LSB_LS		0x45
+
+//LS
+#define LS_MAG_REG_WHO_AM_I       0x4F 
+#define LS_MMA_REG_WHO_AM_I       0x0F 
 
 extern uint8_t input_micro_packet[20];
 
@@ -91,3 +129,5 @@ void read_data_packet();
 void init_microbit_sensors(void);
 void calibrate_compass();
 void write_offset(uint8_t* offset);
+void check_write_offset(uint8_t* offset);
+uint8_t find_version();

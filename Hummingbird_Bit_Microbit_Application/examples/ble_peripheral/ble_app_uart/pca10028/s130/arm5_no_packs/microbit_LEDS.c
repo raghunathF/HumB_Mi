@@ -18,7 +18,7 @@
 APP_TIMER_DEF(micro_LED_timer_id);
 APP_TIMER_DEF(micro_LED_flash);
 /************************************************************************/
-static const  uint8_t microbit_leds[TOTAL_RC]     								= ALL_LED;
+static const  uint8_t microbit_leds[TOTAL_RC]     						= ALL_LED;
 static const  uint8_t rows_leds[TOTAL_LEDS]    								= LEDS_ROWS;
 static const  uint8_t columns_leds[TOTAL_LEDS] 								= LEDS_COLUMNS;
 static const  uint32_t All_LEDbitmap[127]                   	= all_bitmap;
@@ -196,7 +196,7 @@ void init_LEDs_micro(void)
 /************************************************************************
 This is where all the action takes place, in the first part of the program
 calculate what are the coloms to be switched on/off for the respective 
-rows. Second part of the program where we acttually change the output based
+rows. Second part of the program where we actually change the output based
 on the first part of the program
 ************************************************************************/
 void set_all_led_micro(uint32_t  set_led , uint8_t row, bool update_led_value)
@@ -302,6 +302,8 @@ void set_all_led_micro(uint32_t  set_led , uint8_t row, bool update_led_value)
 			
 }
 
+
+
 /************************************************************************/
 // Timeout handler for repeated timer for LED
 static void micro_LED_timer_handler(void * p_context)
@@ -375,7 +377,6 @@ all the characters are printed
 ************************************************************************/
 static void micro_LED_flash_handler(void * p_context)
 {
-	
 	if(LED_array_enable == true)
 	{
 		LED_micro_control(current_flash_bitmap[temp_value_bitmap],0x55);
@@ -390,6 +391,7 @@ static void micro_LED_flash_handler(void * p_context)
 		}
 	}	
 }
+
 
 /************************************************************************/
 //Main function which initialises all the LED array timers

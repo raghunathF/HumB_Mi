@@ -22,6 +22,7 @@
 #include "micro_bit_sensors.h"
 #include "buzzer.h"
 #include "microbit_LEDS.h"
+#include "microbit_io_pwm.h"
 
 /************************************************************************/
 extern bool flash_mb ;
@@ -46,6 +47,8 @@ APP_TIMER_DEF(broadcast_timer_id);
 #define SET_CALIBRATE            0xCE
 #define SET_FIRMWARE             0xCF
 #define STOP_ALL                 0xCB
+#define BROADCAST                'b'
+#define MICRO_IO                 0x90
 
 #define LENGTH_SETALL_SPI        13
 #define LENGTH_OTHER_SPI         4
@@ -53,11 +56,14 @@ APP_TIMER_DEF(broadcast_timer_id);
 #define HARDWARE_VERSION				0x01
 #define MICRO_FIRMWARE_VERSION  0x01
 
+#define HUMMINGBIRD_BIT   0
+#define MICRO_BIT 			  1
+
 
 /************************************************************************/
 static uint8_t samd_firmware_version = 0;
 volatile bool sensor_data_ready = false;
-uint8_t prev_state = 0;
+
 uint8_t flash_data[20]; 
 
 /************************************************************************
@@ -85,7 +91,9 @@ static void send_firmware_number()
 {
 	
 	uint32_t err_code;
-	uint8_t firmware_number[3] = {HARDWARE_VERSION,MICRO_FIRMWARE_VERSION,samd_firmware_version};
+	uint8_t hardware_version_number = 0;
+	hardware_version_number = find_version(); 
+	uint8_t firmware_number[3] = {hardware_version_number ,MICRO_FIRMWARE_VERSION,samd_firmware_version};
 	err_code = ble_nus_string_send(&m_nus, firmware_number, 3);
 	if (err_code != NRF_ERROR_INVALID_STATE)
 	{
@@ -124,7 +132,7 @@ void read_firmware_SAMD()
 	nrf_delay_ms(50);
 	transfer_data(LENGTH_OTHER_SPI,temp);
 	nrf_delay_ms(10);
-  read_data();
+  read_sensor_HB();
 	samd_firmware_version = sensor_outputs[3];
 	//Temporary fix
 	if((samd_firmware_version > 60) && (samd_firmware_version < 250))
@@ -147,18 +155,19 @@ void check_update_name()
 	nrf_delay_ms(2000);   //2 seconds delay
 	transfer_data(LENGTH_SETALL_SPI , temp);
 	nrf_delay_ms(100);
-	read_data();
+	read_sensor_HB();
 	if((sensor_outputs[3]>0x20) && (sensor_outputs[3] < 0xFF))
 	{
 		INITIAL_NAME[0] = 'B';
-		INITIAL_NAME[1] = 'B';
-		prev_state      =  0 ;
+		INITIAL_NAME[1] = 'B';   
+		prev_state      =  HUMMINGBIRD_BIT ;
+		hummingbit_pwm_init();
 	}
 	else
 	{
-		prev_state = 1;
+		prev_state = MICRO_BIT;
+		microbit_pwm_init(); 
 	}
-	
 	read_firmware_SAMD();
 }
 
@@ -174,16 +183,19 @@ void check_update_name_disconnect()
 	static uint8_t temp[13]= { 0xCA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF}; //Initializing Array
 	transfer_data(LENGTH_SETALL_SPI , temp);
 	nrf_delay_ms(100);
-	read_data();
+	read_sensor_HB();
 	if((sensor_outputs[3]>0x20) && (sensor_outputs[3] < 0xFF))
 	{
 		INITIAL_NAME[0] = 'B';
 		INITIAL_NAME[1] = 'B';
 		prev_state      =  0 ;
+		hummingbit_pwm_init();
+		
 	}
 	else
 	{
 		prev_state = 1;
+		microbit_pwm_init(); 
 	}
 	
 	read_firmware_SAMD();
@@ -213,7 +225,7 @@ void init_broadcast_timer(void * p_context)
 }
 
 /************************************************************************
-Broadcast timer will be called every 30msecs
+Broadcast timer iwill be called every 30msecs
 ************************************************************************/
 void broadcast_start()
 {
@@ -231,6 +243,59 @@ void broadcast_stop()
 	broadcast_flag = false;
 }
 
+/*
+uint16_t filter_voltage_output(uint16_t battery_check)
+{
+	static uint16_t battery_check_prev = 0;
+	static bool initial = true;
+	static int count  = 0; 
+	if(initial == true)
+	{
+		initial = false;
+		battery_check_prev = battery_check;
+	}
+	if(battery_check > (battery_check_prev + 5 ))
+	{
+		count++;
+	}
+	else
+	{
+		battery_check_prev = battery_check;
+		count = 0;
+	}
+	if(count > 20)
+	{
+		battery_check_prev = battery_check;
+		count = 0;
+	}
+	//if(threshold_count > )
+	/*
+		static uint16_t battery_check_prev = 0;
+		static uint8_t threshold_count    = 0;
+	  static bool initial = true;
+	  if(initial == true)
+		{
+			initial = false;
+			battery_check_prev = battery_check;
+		}
+		
+	  if(battery_check > (battery_check_prev + 5))
+		{
+			threshold_count = threshold_count + 1;
+			if(threshold_count > 20)
+			{
+				threshold_count = 0;
+				battery_check_prev = battery_check;
+			}
+			
+		}
+		else
+		{
+			threshold_count = 0;
+			battery_check_prev = battery_check;
+		}
+		return battery_check_prev;
+		*/
 
 /************************************************************************
 UART SPI bridge helps to decode the protocol and assigns the command to
@@ -246,10 +311,17 @@ void uart_spi_bridge()
 	uint8_t led3 = 0;
 	uint8_t length = 0;
 	uint16_t time_ms = 0;
+	uint16_t frequency =0;
+	static uint8_t* temp_receive;
+	uint16_t  mode = 0;
 	static uint8_t current_command[20];
 	static uint8_t sensor_command[5] = {0xAA,0xBB,0xCC,0xDD,0xEE};
+	uint16_t next_states[3];
 	
 	//Check if the tail pointer and head pointer match for the ring buffer
+	
+	//microbit_pwm_init(); 
+	//microbit_io_pwm_main(next_states,frequency,time_ms);
 	if(tail_pointer != head_pointer)
 	{
 		 length= buffer_data[head_pointer]; 
@@ -261,34 +333,44 @@ void uart_spi_bridge()
 		 }
 		 head_pointer = head_pointer + length + 1;
 		 //Check if it is set all
-		 if(current_command[0] == SETALL_SPI)
+		 switch(current_command[0])
 		 {
-				//Take what microbit needs
-				led2  						= current_command[13] ;
-				led3 							= current_command[14] ;
-				temp              = current_command[15];
-				temp              = temp << 8;
-				temp             |= current_command[16];
-			 
-				time_ms           = current_command[17];
-				time_ms           = time_ms << 8;
-				time_ms          |= current_command[18];
-				
-				nrf_delay_ms(1);
-				//SPI transfer to SAMD
-				transfer_data(LENGTH_SETALL_SPI,current_command);
+			 case SETALL_SPI:
+					 //Take what microbit needs
+					led2  						= current_command[13] ;
+					led3 							= current_command[14] ;
+					temp              = current_command[15];
+					temp              = temp << 8;
+					temp             |= current_command[16];
 				 
-				LED_HB_control(LED2 ,led2);
-			  LED_HB_control(LED3 ,led3);
-				if(time_ms > 0)
+					time_ms           = current_command[17];
+					time_ms           = time_ms << 8;
+					time_ms          |= current_command[18];
+					
+					nrf_delay_ms(1);
+					//SPI transfer to SAMD
+					transfer_data(LENGTH_SETALL_SPI,current_command);
+					 
+					LED_HB_control(LED2 ,led2);
+					LED_HB_control(LED3 ,led3);
+					if(time_ms > 0)
+					{
+							buzzer_HB_control(temp , time_ms);
+					}
+					break;
+			case MICRO_IO:
+				frequency     	  =  ((uint16_t)current_command[1]<<8 | current_command[2]);
+				time_ms           =  ((uint16_t)current_command[3]<<8 | current_command[5]);
+			  for(i=0;i<3;i++)
 				{
-						buzzer_HB_control(temp , time_ms);
+					mode = current_command[4] & (0x03 << (4 - 2*i)) ; 
+					mode = mode << (4 + 2*i);
+					next_states[i] = mode | current_command[5+i] ;
 				}
-		 }
-		 
-		 //Broadcast Start/Stop
-		 else if(current_command[0] == 'b')
-		 {
+				microbit_io_pwm_main(next_states,frequency,time_ms);
+				break;
+			
+			case BROADCAST:
 				if(current_command[1] == 'g')
 				{
 					 //start timer
@@ -299,11 +381,9 @@ void uart_spi_bridge()
 				{
 					 broadcast_stop();
 				}
-		 }
-		 
-		 //Microbit_Flashing_LEDs
-		 else if(current_command[0] == SET_LEDARRAY)
-		 {
+				break;
+			
+			case SET_LEDARRAY:
 				if((current_command[1] & SYMBOL_STRING_MASK) == SYMBOL )
 				{
 					for(i = 2; i<6;i++)
@@ -326,76 +406,67 @@ void uart_spi_bridge()
 					}
 					else
 					{
-							length_string = current_command[1] & LENGTH_STRING_MASK;
-							if(length_string > 0)
-							{
-									if((current_command[1] & SCROLL_FLASH_MASK) == FLASH )
+						length_string = current_command[1] & LENGTH_STRING_MASK;
+						if(length_string > 0)
+						{
+								if((current_command[1] & SCROLL_FLASH_MASK) == FLASH )
+								{
+									//LED_Flash
+									for(i=0;i<length_string;i++)
 									{
-										//LED_Flash
-										for(i=0;i<length_string;i++)
-										{
-											 flash_data[i]= current_command[i+2];
-										}	
-										update_flash_array(flash_data,length_string);
-										start_flashing_string();			
-									}
-									else
-									{
-										
-											//Place holder for LED scroll 
-									}
-							 }
+										 flash_data[i]= current_command[i+2];
+									}	
+									update_flash_array(flash_data,length_string);
+									start_flashing_string();			
+								}
+						 }
 					}
 				}
-		 }
-		 
-		 //LEDs
-		 else if(current_command[0] == SET_LED_2)
-		 {
+				break;
+			
+			case  SET_LED_2:
 				LED_HB_control(LED2 ,current_command[1]);
-		 }
-		 
-		 else if(current_command[0] == SET_LED_3)
-		 {
+				break;
+			
+			case SET_LED_3:
 				LED_HB_control(LED3 ,current_command[1]);
-		 }
-		 //Stop ALL
-		 else if(current_command[0] == STOP_ALL)
-		 {
-				 broadcast_flag = false;
-				 buzzer_HB_control(0,0);
-				 LED_HB_control(LED2 ,0);
-			   LED_HB_control(LED3 ,0);
-			   stop_LEDarray_display();
-				 nrf_delay_ms(1);
-				 transfer_data(LENGTH_OTHER_SPI,current_command);
-		 }
-		 //Buzzer
-		 else if(current_command[0] == SET_BUZZER)
-		 {
-			 temp              = current_command[1];
-			 temp              = temp << 8;
-			 temp             |= current_command[2];
-			 
-			 time_ms           = current_command[3];
-			 time_ms           = time_ms << 8;
-			 time_ms          |= current_command[4];
-			 buzzer_HB_control(temp , time_ms);
-		 }
-		 //Firmware Version
-		 else if(current_command[0] == SET_FIRMWARE)
-		 {
-			 send_firmware_number();
-		 }
-		 else if(current_command[0] == SET_CALIBRATE)
-		 {
-			 calibrate_compass();
-		 }
-		 //Other cases where it just acts a bridge
-		 else
-		 {
-			 nrf_delay_ms(1);
-			 transfer_data(LENGTH_OTHER_SPI,current_command);
+				break;
+			
+			case STOP_ALL:
+				broadcast_flag = false;
+				if(prev_state == HUMMINGBIRD_BIT)
+				{
+					buzzer_HB_control(0,0);
+					stop_LEDarray_display();
+					LED_HB_control(LED2 ,0);
+					LED_HB_control(LED3 ,0);
+					nrf_delay_ms(1);
+					transfer_data(LENGTH_OTHER_SPI,current_command);
+				}
+				break;
+			
+			case SET_BUZZER:
+				temp              = current_command[1];
+				temp              = temp << 8;
+				temp             |= current_command[2];
+				time_ms           = current_command[3];
+				time_ms           = time_ms << 8;
+				time_ms          |= current_command[4];
+				buzzer_HB_control(temp , time_ms);
+				break;
+			
+			case  SET_FIRMWARE:
+			  send_firmware_number();
+			  break;
+			
+			case SET_CALIBRATE:
+				calibrate_compass();
+				break;
+			
+			default:
+				nrf_delay_ms(1);
+				transfer_data(LENGTH_OTHER_SPI,current_command);
+				break;
 		 }
 		 if(head_pointer == tail_pointer)
 		 {
@@ -412,7 +483,15 @@ void uart_spi_bridge()
 			nrf_delay_ms(10);
 			transfer_data(LENGTH_OTHER_SPI ,sensor_command);
 			read_data_packet();
-			read_data();
+			if(prev_state == MICRO_BIT)
+			{
+					read_sensors();
+			}
+			else
+			{
+				read_sensor_HB();
+			}
+			read_sensor_MB();
 			sensor_data_ready = true;
 		}
 		else
@@ -421,11 +500,13 @@ void uart_spi_bridge()
 			uint32_t refresh_symbol = 0x01555555;
 			static uint32_t sensor_data_output_sum = 0;
 			static uint8_t count_MB_HB_check  = 0;
-			uint8_t current_state = 0;
+			uint8_t current_state = 1;
 			nrf_delay_ms(50);
 			transfer_data(LENGTH_OTHER_SPI ,sensor_command);
 			read_data_packet();
-			read_data();
+			read_sensor_HB();
+			read_sensor_MB();
+			//sensor_outputs[3]= filter_voltage_output((uint16_t)sensor_outputs[3]);
 			sensor_data_output_sum += sensor_outputs[3];
 			count_MB_HB_check++;
 			if(count_MB_HB_check == 100)
@@ -436,7 +517,7 @@ void uart_spi_bridge()
 				{
 						current_state = 1;// Microbit
 				}
-				else
+				else if((sensor_data_output_sum > 80) && (sensor_data_output_sum < 230) )
 				{
 						current_state = 0;//Hummingbit
 				}
@@ -448,7 +529,6 @@ void uart_spi_bridge()
 				}
 				sensor_data_output_sum = 0;
 			 }		
-			}
 		}
-			
+	}		
 }

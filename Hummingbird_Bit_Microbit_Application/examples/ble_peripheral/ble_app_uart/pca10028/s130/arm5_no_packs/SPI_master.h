@@ -14,5 +14,6 @@ extern uint8_t input_micro_packet[20];
 
 void transfer_data_sensor(uint16_t transmit_length);
 void transfer_data(uint16_t transmit_length,uint8_t* data_send);
-void read_data();
+void read_sensor_HB();
+void read_sensor_MB();
 void SPI_init();

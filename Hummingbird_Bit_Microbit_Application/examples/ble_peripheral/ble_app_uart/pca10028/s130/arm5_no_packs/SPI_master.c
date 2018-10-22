@@ -43,15 +43,20 @@ void spi_event_handler(nrf_drv_spi_evt_t const * p_event)
 }
 
 
-void read_data()
+void read_sensor_HB()
 {
+
 	int i =0;
 	
 	for(i=0;i<4;i++)
 	{
-		sensor_outputs[i] = m_rx_buf[i];                 //Read HummingBird Bit inputs
+			sensor_outputs[i] = m_rx_buf[i];                 //Read HummingBird Bit inputs
+
 	}
-	
+}
+void read_sensor_MB()
+{
+	int i =0;
 	for(i=4;i<14;i++)
 	{
 		sensor_outputs[i] = input_micro_packet[i-4];    //Read micro bits inputs

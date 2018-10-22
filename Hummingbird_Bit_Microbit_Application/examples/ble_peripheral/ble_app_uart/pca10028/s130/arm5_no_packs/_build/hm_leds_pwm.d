@@ -35,8 +35,9 @@
 .\_build\hm_leds_pwm.o: ..\..\..\..\..\..\components\drivers_nrf\hal\nrf_ppi.h
 .\_build\hm_leds_pwm.o: ..\..\..\..\..\..\components\libraries\util\sdk_resources.h
 .\_build\hm_leds_pwm.o: ..\..\..\..\..\..\components\softdevice\s130\headers\nrf_sd_def.h
-.\_build\hm_leds_pwm.o: HM_pin.h
+.\_build\hm_leds_pwm.o: micro_pin.h
 .\_build\hm_leds_pwm.o: ..\..\..\..\..\..\components\drivers_nrf\hal\nrf_gpio.h
 .\_build\hm_leds_pwm.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\_build\hm_leds_pwm.o: HM_LEDS.h
 .\_build\hm_leds_pwm.o: ..\..\..\..\..\..\components\drivers_nrf\delay\nrf_delay.h
+.\_build\hm_leds_pwm.o: microbit_io_pwm.h

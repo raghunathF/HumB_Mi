@@ -94,7 +94,7 @@ int32_t nrf_adc_convert_single(nrf_adc_config_input_t input)
 
     nrf_adc_input_select(input);
     nrf_adc_start();
-
+		
     while (!nrf_adc_conversion_finished())
     {
     }
