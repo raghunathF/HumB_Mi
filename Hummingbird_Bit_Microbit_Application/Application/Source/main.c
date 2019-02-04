@@ -60,7 +60,8 @@ int main(void)
 {
    	uint32_t err_code;
 	  APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
-	  
+		
+	
 		//Initialize the buzzer
 	  init_timer_buzzer();
 
@@ -69,6 +70,7 @@ int main(void)
 	
 	  //Initlializing the timer to broadcast values 
 	  init_broadcast_timer();
+	  init_broadcast_uart_timer();
 		
 		//Initialize UART 
 		UARTTXRXInit();
@@ -82,8 +84,10 @@ int main(void)
 		//Initialize PWM module
 		LEDS_PWM_init();
 		
+		
 		//Check if the device is a HummingBirdBit with microbit or just a microbit  
 		check_update_name();
+		
 		
 		//Initialize the Bluetooth stack and configure BLE parameters
 		BLEInit();
@@ -101,9 +105,11 @@ int main(void)
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
 		
+		
     // Enter main loop.    
 		for (;;)
     {
+			//nrf_gpio_pin_set(LED2_TEST);
 			//Look for values recevied through UART service in bluetooth .
 			uart_spi_bridge();
 			//Check the connection status based on a flag in the interrupt and upadte the flashing on the LED screen
@@ -112,6 +118,7 @@ int main(void)
 			check_sound();
 			//Look for values received through UART.
 			check_UART();
+			//nrf_gpio_pin_clear(LED2_TEST);
     }
 }
 

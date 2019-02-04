@@ -82,7 +82,7 @@ void transfer_data(uint16_t transmit_length,uint8_t* data_send)
 
 /************************************************************************/
 //Initializing the values of SPI transfer buffer
-void init_temp_p_data()
+void initSPISendData()
 {
 	  uint8_t i =0;
 	  for(i=0;i<18;i++)
@@ -103,7 +103,7 @@ void SPI_init()
     spi_config.mosi_pin = SPI_MOSI_PIN;
     spi_config.sck_pin  = SPI_SCK_PIN;
     APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, spi_event_handler));
-	 //Initilizing the data to be sent by SPI Master
-	  init_temp_p_data();
+	  //Initilizing the data to be sent by SPI Master
+	  initSPISendData();
 }
 /************************************************************************/

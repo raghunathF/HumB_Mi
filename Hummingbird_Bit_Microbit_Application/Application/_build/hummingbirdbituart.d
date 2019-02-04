@@ -44,3 +44,4 @@
 .\_build\hummingbirdbituart.o: ..\components\drivers_nrf\hal\nrf_peripherals.h
 .\_build\hummingbirdbituart.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\8.11.1\Device\Include\nrf51422_peripherals.h
 .\_build\hummingbirdbituart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\_build\hummingbirdbituart.o: Include\HummingbirdBitGlobal.h

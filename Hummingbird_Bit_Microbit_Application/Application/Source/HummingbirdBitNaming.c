@@ -22,7 +22,7 @@
 
 extern uint8_t initials_name[4];
 extern uint8_t INITIAL_NAME[2];
-char 	DEVICE_NAME [20];
+extern char 	DEVICE_NAME [20];
 /************************************************************************/
 /**@brief 		Function for converting Hex values to ASCII values
  * @param[in] Input in hex to be converted to ASCII
@@ -70,9 +70,9 @@ void set_devicename_array()
 		
 		DEVICE_NAME[6] = convert_ascii(mac.addr[0]&0x0F);
 		DEVICE_NAME[7] = '\0';
-     
 }
 /************************************************************************/
+
 
 /************************************************************************/
 void update_name_disconnect()

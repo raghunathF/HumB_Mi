@@ -56,7 +56,7 @@ extern bool flash_mb ;
 #define LENGTH_OTHER_SPI                          4
 
 #define HARDWARE_VERSION				                  0x01
-#define MICRO_FIRMWARE_VERSION                    0x01
+
 
 #define SENSOR_SEND_LENGTH                				14
 

@@ -14,6 +14,7 @@
 #include "app_timer.h"
 #include "ble_nus.h"
 #include "HummingbirdBitPinout.h"
+#include "HummingbirdBitGlobal.h"
 
 /************************************************************************/
 
@@ -29,7 +30,7 @@
 #define MAX_DATA_LEN                                        25
 
 #define LEN_LRS_COMMAND                                     3
-#define LEN_SETALL_COMMAND1                                  19
+#define LEN_SETALL_COMMAND1                                 19
 #define LEN_CALIBRATE_COMMAND																0
 #define LEN_BUZZER_COMMAND																	4
 #define LEN_LEDARRAY_COMMAND																19
@@ -39,15 +40,20 @@
 #define SPI_MASK 																						0xC0
 /************************************************************************/
 
+
+
 /************************************************************************/
 /******************   Variables        **********************************/
 /************************************************************************/
 APP_TIMER_DEF(refreshTimer);
-static uint8_t index 			= 0;
+//static uint8_t index 			= 0;
 extern uint8_t UARTRingBuffer[255];
 extern volatile uint8_t UARTTailPointer ;
 extern volatile uint8_t UARTHeadPointer ; 
+extern volatile uint8_t UARTIndex;
 /************************************************************************/
+
+
 
 /************************************************************************
 Timer to reset the serial data in case of data corruption
@@ -58,6 +64,7 @@ static void startTimer()
 }
 /************************************************************************/
 
+
 /************************************************************************/
 static void stopTimer()
 {
@@ -66,6 +73,8 @@ static void stopTimer()
 /************************************************************************/
 	
 
+
+
 /************************************************************************
 Ring buffer to store the data length of the commands are different 
 ************************************************************************/
@@ -73,79 +82,21 @@ void uart_event_handle(app_uart_evt_t * p_event)
 {
     static uint8_t data_array[MAX_DATA_LEN];
     
-		static uint8_t bytesLeft  = 0;
-		uint8_t i =0;
+		static volatile  uint8_t bytesLeft  = 0;
+		//uint8_t i =0;
     //uint32_t       err_code;
-		uint8_t firstByte = 0;
+		//uint8_t firstByte = 0;
 
     switch (p_event->evt_type)
     {
         case APP_UART_DATA_READY:
-            UNUSED_VARIABLE(app_uart_get(&data_array[index]));
-						if(index == 0)
-						{
-							startTimer();
-							firstByte = data_array[index];
-							if( (firstByte & SPI_MASK) == SPI_MASK )
-							{
-									if(firstByte == SETALL_COMMAND)
-									{
-											firstByte = 'A';
-									}
-									else
-									{
-											firstByte = 'a';
-									}
-							}
-							switch(firstByte)
-							{
-								//Length of smaller commands to read individual data for hummingbird bit
-								case 'a':
-									bytesLeft = LEN_LRS_COMMAND;
-									break;
-								//Length of set all command
-								case 'A':
-									bytesLeft = LEN_SETALL_COMMAND1;
-									break;
-								//Length of calibrate
-								case 'C':
-									bytesLeft = LEN_CALIBRATE_COMMAND;
-									break;
-								//Length of buzzer
-								case 'B':
-									bytesLeft = LEN_BUZZER_COMMAND;
-									break;
-								//Length of LED ARRAY
-								case 'l':
-									bytesLeft = LEN_LEDARRAY_COMMAND;
-									break;
-								//Length of read
-								case 'R':
-									bytesLeft = LEN_READ_COMMAND;
-									break;
-								default:
-									bytesLeft = 0;
-									break;
-							}
-						}
-						//read all the data and store in a global variable
-            index++;
-						if(bytesLeft == 0)
-						{
-							stopTimer();
-							for(i=0;i<index;i++)
-							{
-								UARTRingBuffer[UARTHeadPointer] = data_array[i];
-								UARTHeadPointer = UARTHeadPointer + 1;
-							}
-							index = 0;
-							
-						}
-						else
-						{
-							bytesLeft--;
-						}
-						
+					  //test pin 2 set
+					  //nrf_gpio_pin_set(LED2_TEST);
+            UNUSED_VARIABLE(app_uart_get(&data_array[UARTIndex]));
+						UARTRingBuffer[UARTHeadPointer] = data_array[UARTIndex];
+						UARTHeadPointer = UARTHeadPointer + 1;
+						//test pin 2 low
+						//nrf_gpio_pin_clear(LED2_TEST);
             break;
 
         case APP_UART_COMMUNICATION_ERROR:
@@ -162,14 +113,20 @@ void uart_event_handle(app_uart_evt_t * p_event)
 }
 
 
+
 /************************************************************************/
 void sendUART(uint8_t* inputData , uint8_t length)
 {
 	uint8_t i =0;
+	//test pin 1 low
+	//nrf_gpio_pin_set(TEST_PIN_1);
 	for(i=0;i<length;i++)
 	{
 		app_uart_put(inputData[i]);
 	}
+	//test pin 1 high
+	//nrf_gpio_pin_clear(TEST_PIN_1);
+	
 }
 /************************************************************************/
 
@@ -177,6 +134,7 @@ void sendUART(uint8_t* inputData , uint8_t length)
 void UARTInit()
 {
 	uint32_t    err_code;
+	//testPinsInit();
   const app_uart_comm_params_t comm_params =
    {
         RX_MICRO,
@@ -204,11 +162,12 @@ complete length of the data
 ************************************************************************/
 static void refreshTimerHandler(void * p_context)
 {
-		index = 0;
+		//index = 0;
 		UARTHeadPointer = 0;
 		UARTTailPointer = 0;
 }
 /************************************************************************/
+
 
 /************************************************************************/
 void createRefreshTimer()
@@ -216,6 +175,7 @@ void createRefreshTimer()
 		app_timer_create(&refreshTimer,APP_TIMER_MODE_SINGLE_SHOT,refreshTimerHandler);
 }
 /************************************************************************/
+
 
 /************************************************************************/
 void UARTTXRXInit()

@@ -38,11 +38,15 @@
 .\_build\hummingbirdbituartcontrol.o: Include\sdk_config.h
 .\_build\hummingbirdbituartcontrol.o: ..\components\libraries\util\nordic_common.h
 .\_build\hummingbirdbituartcontrol.o: ..\components\libraries\util\app_error_weak.h
+.\_build\hummingbirdbituartcontrol.o: ..\components\libraries\timer\app_timer.h
 .\_build\hummingbirdbituartcontrol.o: ..\components\drivers_nrf\delay\nrf_delay.h
+.\_build\hummingbirdbituartcontrol.o: ..\components\drivers_nrf\hal\nrf_gpio.h
+.\_build\hummingbirdbituartcontrol.o: ..\components\drivers_nrf\hal\nrf_peripherals.h
+.\_build\hummingbirdbituartcontrol.o: C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\8.11.1\Device\Include\nrf51422_peripherals.h
+.\_build\hummingbirdbituartcontrol.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\_build\hummingbirdbituartcontrol.o: Include\HummingbirdBitLEDS.h
 .\_build\hummingbirdbituartcontrol.o: Include\HummingbirdBitBuzzer.h
 .\_build\hummingbirdbituartcontrol.o: Include\HummingbirdBitSPIMaster.h
-.\_build\hummingbirdbituartcontrol.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\_build\hummingbirdbituartcontrol.o: Include\HummingbirdBitLEDArray.h
 .\_build\hummingbirdbituartcontrol.o: Include\HummingbirdBitSensors.h
 .\_build\hummingbirdbituartcontrol.o: Include\HummingbirdBitGlobal.h

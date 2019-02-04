@@ -145,7 +145,6 @@ void check_update_name_disconnect()
 		INITIAL_NAME[1] = 'B';
 		prev_state      =  0 ;
 		hummingbit_pwm_init();
-		
 	}
 	else
 	{
@@ -276,6 +275,7 @@ void uart_spi_bridge()
 					break;
 			//Changing the inputs mode based on the requested command
 			case MICRO_IO:
+				
 				frequency     	  =  ((uint16_t)current_command[1]<<8 | current_command[2]);
 				time_ms           =  ((uint16_t)current_command[3]<<8 | current_command[5]);
 			  for(i=0;i<3;i++)
@@ -354,10 +354,10 @@ void uart_spi_bridge()
 			//Switch off LEDS , LED Array , stop buxxer . Send Stop command to SAMD
 			case STOP_ALL:
 				//broadcast_flag = false;
+			  stop_LEDarray_display();
 				if(prev_state == HUMMINGBIRD_BIT)
 				{
 					buzzer_HB_control(0,0);
-					stop_LEDarray_display();
 					LED_HB_control(LED2 ,0);
 					LED_HB_control(LED3 ,0);
 					nrf_delay_ms(1);

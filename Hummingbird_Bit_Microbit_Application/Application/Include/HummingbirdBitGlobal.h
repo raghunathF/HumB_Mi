@@ -16,7 +16,7 @@
 /******************     Defines        **********************************/
 /************************************************************************/
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_OP_QUEUE_SIZE         10                                           /**< Size of timer operation queues. */
+#define APP_TIMER_OP_QUEUE_SIZE         11                                           /**< Size of timer operation queues. */
 
 #define HUMMINGBIRDBIT									1
 #define MICROBIT												0
@@ -32,8 +32,8 @@
 #define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
 #define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
 
-#define TEST_PIN_1 											18                                           /**Debug test pins **/    
-#define TEST_PIN_2 											1
+#define LED3_TEST 											18                                           /**Debug test pins **/ //LED3   
+#define LED2_TEST 											1																						//LED2
 
 #define SENSORS_LENGTH  								5
 

@@ -21,6 +21,8 @@ uint8_t input_micro_packet[20];
 
 ble_nus_t                        m_nus; 
 
+char 	DEVICE_NAME [20];
+
 bool led_change = false;
 bool fake_firware_send = false;
 bool app_selected = false;
@@ -52,6 +54,7 @@ uint8_t    currentConnectionMode = ADVERTISING_MODE;
 
 const char possible_names[] = {'F','N','H','M','F','L','H','B','B','2','C','3'};   //Just to be safe used A1,B2,C3
 
+volatile uint8_t   UARTIndex = 0;
 
 int mood_bit = 0;
 uint8_t temp_p_data[20];
