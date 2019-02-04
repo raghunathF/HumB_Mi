@@ -1,0 +1,12 @@
+.\_build\hummingbirdbitnaming.o: Source\HummingbirdBitNaming.c
+.\_build\hummingbirdbitnaming.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\_build\hummingbirdbitnaming.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\_build\hummingbirdbitnaming.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+.\_build\hummingbirdbitnaming.o: ..\components\softdevice\s130\headers\ble_gap.h
+.\_build\hummingbirdbitnaming.o: ..\components\softdevice\s130\headers\ble_types.h
+.\_build\hummingbirdbitnaming.o: ..\components\softdevice\s130\headers\ble_ranges.h
+.\_build\hummingbirdbitnaming.o: ..\components\softdevice\s130\headers\nrf_svc.h
+.\_build\hummingbirdbitnaming.o: Include\HummingbirdBitLEDMapping.h
+.\_build\hummingbirdbitnaming.o: Include\HummingbirdBitRudeWords.h
+.\_build\hummingbirdbitnaming.o: Include\HummingbirdBitBLEControl.h
+.\_build\hummingbirdbitnaming.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
