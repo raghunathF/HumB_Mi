@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\_build\HummingbirdBitMicro.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\_build\HummingbirdBitMicro.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Mon Feb 04 14:35:23 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Fri Feb 08 16:15:01 2019
 <BR><P>
 <H3>Maximum Stack Usage =        456 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -593,8 +593,7 @@ Global Symbols
 <P><STRONG><a name="[ca]"></a>__ARM_common_switch8</STRONG> (Thumb, 26 bytes, Stack size 8 bytes, hummingbirdbitledarray.o(i.__ARM_common_switch8))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = __ARM_common_switch8
 </UL>
-<BR>[Called By]<UL><LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_UART
-<LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_advertising_start
+<BR>[Called By]<UL><LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ble_advertising_start
 <LI><a href="#[142]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_all_led_micro
 </UL>
 
@@ -1156,8 +1155,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_sound
 </UL>
 
-<P><STRONG><a name="[e6]"></a>calibrate_compass</STRONG> (Thumb, 490 bytes, Stack size 88 bytes, hummingbirdbitcalibration.o(i.calibrate_compass))
-<BR><BR>[Stack]<UL><LI>Max Depth = 308<LI>Call Chain = calibrate_compass &rArr; check_write_offset &rArr; write_offset_ls &rArr; nrf_drv_twi_tx &rArr; nrf_drv_twi_xfer &rArr; twi_xfer &rArr; twi_tx_start_transfer &rArr; twi_transfer &rArr; twi_send_byte
+<P><STRONG><a name="[e6]"></a>calibrate_compass</STRONG> (Thumb, 526 bytes, Stack size 96 bytes, hummingbirdbitcalibration.o(i.calibrate_compass))
+<BR><BR>[Stack]<UL><LI>Max Depth = 316<LI>Call Chain = calibrate_compass &rArr; check_write_offset &rArr; write_offset_ls &rArr; nrf_drv_twi_tx &rArr; nrf_drv_twi_xfer &rArr; twi_xfer &rArr; twi_tx_start_transfer &rArr; twi_transfer &rArr; twi_send_byte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_write_offset
 <LI><a href="#[ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;write_calib_values
@@ -1179,7 +1178,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[143]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;microbit_io_pwm_main
 </UL>
 
-<P><STRONG><a name="[ee]"></a>check_UART</STRONG> (Thumb, 722 bytes, Stack size 32 bytes, hummingbirdbituartcontrol.o(i.check_UART))
+<P><STRONG><a name="[ee]"></a>check_UART</STRONG> (Thumb, 644 bytes, Stack size 32 bytes, hummingbirdbituartcontrol.o(i.check_UART))
 <BR><BR>[Stack]<UL><LI>Max Depth = 352<LI>Call Chain = check_UART &rArr; UARTDisconnection &rArr; ble_advertising_start &rArr; set_adv_mode_slow &rArr; ble_advdata_set &rArr; adv_data_encode &rArr; uuid_list_encode &rArr; uuid_list_sized_encode
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;transfer_data
@@ -1198,7 +1197,6 @@ Global Symbols
 <LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTDisconnection
 <LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;nrf_delay_ms
 <LI><a href="#[f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendUART
-<LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__ARM_common_switch8
 </UL>
 <BR>[Called By]<UL><LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -2281,11 +2279,12 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getInitials_fancyName
 </UL>
 
-<P><STRONG><a name="[f7]"></a>sendInitialData</STRONG> (Thumb, 54 bytes, Stack size 16 bytes, hummingbirdbituartcontrol.o(i.sendInitialData))
+<P><STRONG><a name="[f7]"></a>sendInitialData</STRONG> (Thumb, 60 bytes, Stack size 16 bytes, hummingbirdbituartcontrol.o(i.sendInitialData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = sendInitialData &rArr; readFirmwareSAMD &rArr; transfer_data &rArr; nrf_drv_spi_transfer &rArr; nrf_drv_spi_xfer &rArr; spi_xfer &rArr; transfer_byte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[184]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;find_version
 <LI><a href="#[175]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;readFirmwareSAMD
+<LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;nrf_delay_ms
 <LI><a href="#[f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendUART
 </UL>
 <BR>[Called By]<UL><LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_UART
@@ -2584,7 +2583,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[12f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_microbit_sensors
 </UL>
 
-<P><STRONG><a name="[26]"></a>uart_event_handle</STRONG> (Thumb, 56 bytes, Stack size 16 bytes, hummingbirdbituart.o(i.uart_event_handle))
+<P><STRONG><a name="[26]"></a>uart_event_handle</STRONG> (Thumb, 108 bytes, Stack size 16 bytes, hummingbirdbituart.o(i.uart_event_handle))
 <BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = uart_event_handle &rArr; app_uart_get &rArr; nrf_drv_uart_rx &rArr; nrf_drv_uart_rx_for_uart &rArr; rx_byte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_error_handler_bare
@@ -2796,6 +2795,7 @@ Local Symbols
 </UL>
 <P><STRONG><a name="[f3]"></a>nrf_delay_ms</STRONG> (Thumb, 42 bytes, Stack size 0 bytes, hummingbirdbituartcontrol.o(i.nrf_delay_ms))
 <BR><BR>[Called By]<UL><LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;check_UART
+<LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendInitialData
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;receiveRemainingBytes
 </UL>
 

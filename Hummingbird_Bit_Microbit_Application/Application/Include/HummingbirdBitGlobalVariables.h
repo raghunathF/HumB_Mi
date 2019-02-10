@@ -83,7 +83,8 @@ uint8_t read_axis_mag[LENGTH_AXIS_DATA] ;
 
 uint8_t calibrate_feedback = 0 ; 
 uint8_t accl_mag_chip = 0;
+
 /* Indicates if operation on TWI has ended. */
 volatile bool m_xfer_done = false;
-
+volatile bool    calibrationFlag = false;
 /************************************************************************/
