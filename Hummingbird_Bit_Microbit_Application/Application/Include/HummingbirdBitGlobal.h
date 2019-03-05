@@ -47,4 +47,9 @@
 
 #define REFRESH_SYMBOL              0x155555
 
+#define BROKEN											2 
+#define FAILURE											0
+#define SUCCESS											1
+
+
 /************************************************************************/

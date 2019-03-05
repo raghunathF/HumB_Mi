@@ -105,6 +105,8 @@ APP_TIMER_DEF(broadcast_timer_uart_id);
 #define SERIAL_RECEIVE_FAILURE															0
 #define SERIAL_RECEIVE_SUCCESS															1
 
+#define ALIVE_THRESHOLD_COUNTER															30*5
+
 /************************************************************************/
 
 /************************************************************************
@@ -244,7 +246,8 @@ void sendInitialData()
 	uint8_t HummingBitState     = 0;
 	uint8_t hardware_version_number = 0;
 	uint8_t initialBuffer[4] = {hardware_version_number ,MICRO_FIRMWARE_VERSION, samdFirmwareVersion, HummingBitState};
-
+	
+	nrf_delay_ms(10);
 	hardware_version_number = find_version();
   samdFirmwareVersion = readFirmwareSAMD();
 	if(samdFirmwareVersion != 255)
@@ -334,6 +337,20 @@ void setLEDArray(uint8_t* receiveBuffer)
 			}
 }
 
+void UARTDisconnection()
+{	  
+	  uint32_t err_code = 0;
+	  //stop broadcast UART timer
+	
+		broadcast_uart_stop();
+		stopAll();
+		start_advertising_flashing = true;
+		sound_effect  = SOUND_DISCONNECTION;
+		currentConnectionMode = ADVERTISING_MODE;
+		err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+		APP_ERROR_CHECK(err_code);
+}
+
 
 /************************************************************************
 See whats received in ring buffer if you receive something read the
@@ -351,6 +368,8 @@ void check_UART()
 	uint8_t  temp_transmit[4] = {0x55,0x66,0x77,0x88} ;
   static uint8_t temp_receive[20] ;
 	uint8_t internal_err_code = 0;
+	uint8_t calibrateStatus = 0;
+	static uint8_t UARTConnectionAliveCounter = 0;
 
 	if(UARTHeadPointer != UARTTailPointer)
 	{
@@ -359,6 +378,7 @@ void check_UART()
 		//UARTTailPointer++;
 		switch(firstByte)
 		{
+			/*
 			case LED1_COMMAND:
 				internal_err_code = receiveRemainingBytes(receiveBuffer,LEN_LRS_COMMAND);
 			  if(internal_err_code == SERIAL_RECEIVE_SUCCESS)
@@ -428,20 +448,24 @@ void check_UART()
 					transfer_data(LEN_LRS_COMMAND,receiveBuffer);
 				}
 				break;
+		  */
 			case CALIBRATE_COMMAND:
 				if(currentConnectionMode == UART_MODE)
 				{
 					internal_err_code = receiveRemainingBytes(receiveBuffer,LEN_CALIBRATE_COMMAND);
 					if(internal_err_code == SERIAL_RECEIVE_SUCCESS )
 					{
-						calibrate_compass();
+						calibrateStatus  = calibrate_compass();
 						read_sensor_HB();
 						read_sensor_MB();
 						for(i=0;i<LEN_SENSOR_ALL;i++)
 						{
 							temp_receive[i] = sensor_outputs[i];
 						}
-						sendUART(temp_receive, LEN_READ_ALL);
+						if(calibrateStatus != BROKEN)
+						{
+							sendUART(temp_receive, LEN_READ_ALL);
+						}
 					}
 					
 				}
@@ -461,8 +485,6 @@ void check_UART()
 			case	SETALL_COMMAND:
 				if(currentConnectionMode == UART_MODE)
 				{
-					
-					
 					internal_err_code 		= receiveRemainingBytes(receiveBuffer,LEN_SETALL_COMMAND);
 					if(internal_err_code == SERIAL_RECEIVE_SUCCESS )
 					{
@@ -475,7 +497,6 @@ void check_UART()
 						LED_HB_control(LED3 ,receiveBuffer[14]);
 						setBuzzer(&receiveBuffer[15]);
 					}
-					
 				}
 				break;
 			case	SETLED_COMMAND:
@@ -508,6 +529,7 @@ void check_UART()
 					switch(receiveBuffer[1])
 					{
 						case START_CONNECTION_COMMAND:
+							UARTConnectionAliveCounter = 0;
 							if(currentConnectionMode != BLUETOOTH_MODE)
 							{
 								sound_effect  = SOUND_CONNECTION;
@@ -538,14 +560,7 @@ void check_UART()
 							//start advertising
 							if(currentConnectionMode != ADVERTISING_MODE)
 							{
-								//stop broadcast UART timer
-								broadcast_uart_stop();
-								stopAll();
-								start_advertising_flashing = true;
-								sound_effect  = SOUND_DISCONNECTION;
-								currentConnectionMode = ADVERTISING_MODE;
-								err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
-								APP_ERROR_CHECK(err_code);
+								UARTDisconnection();
 							}
 							//Send info regarding successfull reception
 							break;
@@ -583,6 +598,8 @@ void check_UART()
 							sendInitialData();
 							break;
 						case COMPLETE_COMMAND:
+							//
+						  UARTConnectionAliveCounter = 0;
 							if(currentConnectionMode == UART_MODE)
 							{
 								read_sensor_HB();
@@ -625,6 +642,7 @@ void check_UART()
 	{	
 		//UARTHeadPointer = 0;
 		//UARTTailPointer  = 0;
+		//Every 30 msec
 		if(broadcast_uart_ready == true)
 		{
 			broadcast_uart_ready = false;
@@ -633,6 +651,16 @@ void check_UART()
 			read_data_packet();
 			read_sensor_HB();
 			read_sensor_MB();
+			UARTConnectionAliveCounter++;
+			//Check if theh connection is still exists
+			if( UARTConnectionAliveCounter > ALIVE_THRESHOLD_COUNTER)
+			{
+				if(currentConnectionMode != ADVERTISING_MODE)
+				{
+						UARTDisconnection();
+				}
+			}
+			
 		}
 	}
 	

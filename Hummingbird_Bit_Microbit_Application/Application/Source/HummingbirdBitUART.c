@@ -51,6 +51,7 @@ extern uint8_t UARTRingBuffer[255];
 extern volatile uint8_t UARTTailPointer ;
 extern volatile uint8_t UARTHeadPointer ; 
 extern volatile uint8_t UARTIndex;
+extern volatile bool    calibrationFlag;
 /************************************************************************/
 
 
@@ -83,6 +84,7 @@ void uart_event_handle(app_uart_evt_t * p_event)
     static uint8_t data_array[MAX_DATA_LEN];
     
 		static volatile  uint8_t bytesLeft  = 0;
+	
 		//uint8_t i =0;
     //uint32_t       err_code;
 		//uint8_t firstByte = 0;
@@ -94,7 +96,25 @@ void uart_event_handle(app_uart_evt_t * p_event)
 					  //nrf_gpio_pin_set(LED2_TEST);
             UNUSED_VARIABLE(app_uart_get(&data_array[UARTIndex]));
 						UARTRingBuffer[UARTHeadPointer] = data_array[UARTIndex];
+						
 						UARTHeadPointer = UARTHeadPointer + 1;
+				    
+					    if(calibrationFlag == true)
+							{
+						
+								if((UARTHeadPointer - UARTTailPointer) == 2)
+								{
+									
+									if((UARTRingBuffer[UARTTailPointer]=='R')&&(((UARTRingBuffer[UARTTailPointer+1]=='o')) || ((UARTRingBuffer[UARTTailPointer+1]=='x'))))
+									{
+											 calibrationFlag = false;
+									}
+									
+								}
+							
+							}
+				    
+				
 						//test pin 2 low
 						//nrf_gpio_pin_clear(LED2_TEST);
             break;

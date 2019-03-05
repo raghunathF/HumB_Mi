@@ -61,7 +61,6 @@ int main(void)
    	uint32_t err_code;
 	  APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
 		
-	
 		//Initialize the buzzer
 	  init_timer_buzzer();
 

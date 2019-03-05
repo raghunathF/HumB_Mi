@@ -27,6 +27,8 @@ static int16_t calibrate_mag[300][3];
 extern uint8_t read_axis_mag[LENGTH_AXIS_DATA] ;
 extern uint8_t calibrate_feedback;
 extern uint8_t accl_mag_chip;
+
+extern volatile bool    calibrationFlag;
 /************************************************************************/
 
 /************************************************************************
@@ -36,18 +38,18 @@ If the difference between X,Y,Z min and X,Y,Z max is greater than 700
 and half amount of time is passed then tick mark is displayed and if not cross mark
 is displayed.
 ************************************************************************/
-void calibrate_compass()
+uint8_t calibrate_compass()
 {
 	volatile uint32_t led_array 				 = 0x00000000;
 	
 	//uint32_t err_code 									 = 0;
 	uint16_t i,j 												 = 0;
 	uint8_t brightness 				 					 = 0x55;  //currently not using
+	uint8_t calibrationStatus            = FAILURE;
 	
-	
-	int16_t min_x					=    32765;
-	int16_t min_y					=    32765;
-	int16_t min_z					=    32765;
+	int16_t min_x					=     32765;
+	int16_t min_y					=     32765;
+	int16_t min_z					=     32765;
 	int16_t max_x					=    -32765;
 	int16_t max_y					=    -32765;
 	int16_t max_z					=    -32765;
@@ -76,7 +78,7 @@ void calibrate_compass()
 	
 	
 	//Indication of start with LED array
-	
+	calibrationFlag = true;
 	for(i=0;i<loop_count;i++)
 	{
 		check_read_sensor_data_mag();
@@ -124,6 +126,13 @@ void calibrate_compass()
 			max_z  = calibrate_mag[i][2];
 		}
 		
+		if(calibrationFlag == false)
+		{
+			calibrationStatus  = BROKEN;
+			result_calib= false;
+			break;
+		}
+		
 		if(accl_mag_chip == NXP)
 		{
 			//Check if the maximum settings have been reached
@@ -157,6 +166,7 @@ void calibrate_compass()
 	//Tick Mark
 	if(result_calib == true)
 	{
+		calibrationStatus  = SUCCESS;
 		calibrate_feedback = 0x04;
 		//Hard iron offset
 		offset_x = ((max_x + min_x)/2);
@@ -218,9 +228,14 @@ void calibrate_compass()
 	}
 	else
 	{
+	
 		calibrate_feedback = 0x08;
 		LED_micro_control(WRONG_LEDARRAY,brightness);
 	  nrf_delay_ms(1000);
 	  LED_micro_control(0x00000000,brightness);
 	}
+	calibrationFlag = false;
+	
+	return calibrationStatus;
+
 }
