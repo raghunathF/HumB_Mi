@@ -59,8 +59,8 @@
 #define MAG_REG_OFFSET_X_MSB_LS		  0x09
 #define LENGTH_OFFSET_DATA          6
 
-#define MIN_THRESHOLD_CALIB         700
-#define MIN_THRESHOLD_CALIB_LS      100
+#define MIN_THRESHOLD_CALIB         400    //40uT
+#define MIN_THRESHOLD_CALIB_LS      267    //40uT
 
 #define EXT_REG_HW_LSB 							0x00
 #define EXT_ADDR       							0x49
