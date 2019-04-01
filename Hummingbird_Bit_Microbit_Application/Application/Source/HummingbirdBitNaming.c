@@ -31,7 +31,7 @@ extern char 	DEVICE_NAME [20];
 char convert_ascii(uint8_t input)
 {
 	char output;
-	if(input >= 0 & input <=9)
+	if(input <=9)
 	{
 		output = input + 0x30;
 	}
@@ -117,7 +117,8 @@ void getInitials_fancyName()
 	  bool rude_word = true;
 	  ble_gap_addr_t 					mac;
     sd_ble_gap_address_get(&mac);
-		volatile uint32_t temp = 0;
+		uint32_t temp = 0;
+	  uint16_t tempCount =0;
 	  uint8_t mod16 = 0;
     uint8_t top8  = 0;
     uint8_t bot6  = 0;
@@ -141,9 +142,11 @@ void getInitials_fancyName()
 			if(rude_word == true)
 			{
 				initials_name[0] = name_first[top8 + mod16];
-				initials_name[1] = name_second[(mid6 + mod16 + 1)%512];
+				initials_name[1] = name_second[(mid6 + mod16 + tempCount)%512];
 				initials_name[2] = name_third[bot6 + mod16];
+				
 			}
+			tempCount++;
 		}
 }
 /************************************************************************/
