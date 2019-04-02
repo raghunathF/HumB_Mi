@@ -40,7 +40,7 @@
 #define HUMMINGBIRD_BIT   							0
 #define MICRO_BIT 			  							1
 
-#define MICRO_FIRMWARE_VERSION  				0x01
+#define MICRO_FIRMWARE_VERSION  				0x02
 
 #define NXP 												1
 #define LS													2
