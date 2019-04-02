@@ -27,44 +27,13 @@ Project File Date:  02/21/2019
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'nrf51422_xxac'
-compiling HummingbirdBitSensors.c...
-compiling HummingbirdBitBLEControl.c...
-Source\HummingbirdBitBLEControl.c(179): warning:  #167-D: argument of type "void (*)()" is incompatible with parameter of type "app_timer_timeout_handler_t"
-  	 err_code = app_timer_create(&broadcast_timer_id,APP_TIMER_MODE_REPEATED,broadcast_timer_handler);
-Source\HummingbirdBitBLEControl.c(48): warning:  #177-D: function "send_fake_firmware_number"  was declared but never referenced
-  static void send_fake_firmware_number()
-Source\HummingbirdBitBLEControl.c: 2 warnings, 0 errors
-compiling main.c...
-compiling HummingbirdBitSound.c...
-compiling HummingbirdBitUART.c...
-Source\HummingbirdBitUART.c(62): warning:  #177-D: function "startTimer"  was declared but never referenced
-  static void startTimer()
-Source\HummingbirdBitUART.c(70): warning:  #177-D: function "stopTimer"  was declared but never referenced
-  static void stopTimer()
-Source\HummingbirdBitUART.c: 2 warnings, 0 errors
-compiling HummingbirdBitUARTControl.c...
-Source\HummingbirdBitUARTControl.c(126): warning:  #167-D: argument of type "void (*)()" is incompatible with parameter of type "app_timer_timeout_handler_t"
-  	 err_code = app_timer_create(&broadcast_timer_uart_id,APP_TIMER_MODE_REPEATED,broadcast_timer_uart_handler);
-Source\HummingbirdBitUARTControl.c(365): warning:  #177-D: variable "err_code"  was declared but never referenced
-  	uint32_t err_code = 0;
-Source\HummingbirdBitUARTControl.c: 2 warnings, 0 errors
-compiling HummingbirdBitNaming.c...
-compiling HummingbirdBitBLEInit.c...
-compiling HummingbirdBitBLECallbacks.c...
 compiling softdevice_handler.c...
 "no source": Error:  #5: cannot open source input file "..\..\..\..\..\..\components\softdevice\common\softdevice_handler\softdevice_handler.c": No such file or directory
 ..\..\..\..\..\..\components\softdevice\common\softdevice_handler\softdevice_handler.c: 0 warnings, 1 error
-compiling HummingbirdBitMagnetometer.c...
-Source\HummingbirdBitMagnetometer.c(36): warning:  #177-D: variable "mag_reg_2"  was declared but never referenced
-  	  uint8_t mag_reg_2[2]   = {MAG_REG_CTRL2, MAG_CTRL2_VALUE};
-Source\HummingbirdBitMagnetometer.c(18): warning:  #177-D: variable "read_temp_mag"  was declared but never referenced
-  static uint8_t read_temp_mag[LENGTH_TEMP_DATA];
-Source\HummingbirdBitMagnetometer.c: 2 warnings, 0 errors
-compiling HummingbirdBitCalibration.c...
 linking...
 Program Size: Code=29228 RO-data=3120 RW-data=392 ZI-data=7168  
 FromELF: creating hex file...
-".\_build\HummingbirdBitMicro.axf" - 0 Error(s), 8 Warning(s).
+".\_build\HummingbirdBitMicro.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -94,7 +63,7 @@ Package Vendor: NordicSemiconductor
       Include file:  Device\Include\system_nrf51.h
       Source file:   Device\Source\arm\arm_startup_nrf51.s
       Source file:   Device\Source\system_nrf51.c
-Build Time Elapsed:  00:00:10
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

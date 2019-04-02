@@ -18,6 +18,8 @@
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_OP_QUEUE_SIZE         11                                           /**< Size of timer operation queues. */
 
+#define CHROMEBOOK 
+
 #define HUMMINGBIRDBIT									1
 #define MICROBIT												0
 
@@ -40,7 +42,11 @@
 #define HUMMINGBIRD_BIT   							0
 #define MICRO_BIT 			  							1
 
+#ifdef  CHROMEBOOK
+#define MICRO_FIRMWARE_VERSION  				0x52
+#else
 #define MICRO_FIRMWARE_VERSION  				0x02
+#endif
 
 #define NXP 												1
 #define LS													2
